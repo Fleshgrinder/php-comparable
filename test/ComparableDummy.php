@@ -21,9 +21,19 @@ final class ComparableDummy implements Comparable {
     /**
      * The value that should be returned by the comparable method.
      *
-     * @var integer
+     * @var mixed
      */
-    public $compareTo = 0;
+    public $compareTo;
+
+    /**
+     * Construct new comparable dummy instance.
+     *
+     * @param mixed $compareTo [optional]
+     *     Value that should be returned by this instance.
+     */
+    public function __construct($compareTo = 0) {
+        $this->compareTo = $compareTo;
+    }
 
     /**
      * @inheritDoc
