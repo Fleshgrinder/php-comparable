@@ -1,0 +1,21 @@
+{
+    "name": "fleshgrinder/comparable",
+    "description": "Interface for custom compare checks of objects.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Richard Fussenegger",
+            "email": "fleshgrinder@users.noreply.github.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Fleshgrinder\\Core\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Fleshgrinder\\Core\\": "test/"
+        }
+    }
+}
