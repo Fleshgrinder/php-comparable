@@ -1,3 +1,5 @@
+[![Packagist](https://img.shields.io/packagist/v/Fleshgrinder/comparable.svg?style=flat-square)](https://packagist.org/packages/fleshgrinder/comparable)
+[![Packagist License](https://img.shields.io/packagist/l/Fleshgrinder/comparable.svg?style=flat-square)](https://packagist.org/packages/fleshgrinder/comparable)
 # Comparable
 Interface to implement custom comparison logic for classes instead of writing them inline over and over again.
  
