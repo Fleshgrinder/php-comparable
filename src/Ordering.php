@@ -30,22 +30,22 @@ class Ordering implements Comparable {
 
 	/** Construct new ordering instance. */
 	public static function new(int $order): self {
-		return new self($order);
+		return new static($order);
 	}
 
 	/** An ordering where a compared value is less than another. */
-	public static function Less(): self {
-		return new self(self::LT);
+	final public static function Less(): self {
+		return new static(self::LT);
 	}
 
 	/** An ordering where a compared value is equal to another. */
-	public static function Equal(): self {
-		return new self(self::EQ);
+	final public static function Equal(): self {
+		return new static(self::EQ);
 	}
 
 	/** An ordering where a compared value is greater than another. */
-	public static function Greater(): self {
-		return new self(self::GT);
+	final public static function Greater(): self {
+		return new static(self::GT);
 	}
 
 	/** Whether this ordering is less. */
