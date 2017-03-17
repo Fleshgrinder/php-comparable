@@ -32,6 +32,8 @@
 		}
 	},
 	"scripts": {
+		"post-install-cmd": "git update-index --skip-worktree .idea/php-comparable.iml",
+		"post-update-cmd": "git update-index --skip-worktree .idea/php-comparable.iml",
 		"test": "phpunit --colors=always --testdox"
 	}
 }
