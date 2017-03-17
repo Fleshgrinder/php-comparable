@@ -1,21 +1,37 @@
 {
-    "name": "fleshgrinder/comparable",
-    "description": "Interface for custom compare checks of objects.",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Richard Fussenegger",
-            "email": "fleshgrinder@users.noreply.github.com"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "Fleshgrinder\\Core\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Fleshgrinder\\Core\\": "test/"
-        }
-    }
+	"name": "fleshgrinder/comparable",
+	"description": "Type-safe comparison for PHP.",
+	"license": "Unlicense",
+	"authors": [
+		{
+			"name": "Richard Fussenegger",
+			"email": "fleshgrinder@users.noreply.github.com"
+		}
+	],
+	"require": {
+		"php": "^7.0",
+		"fleshgrinder/equalable": "^1.0",
+		"fleshgrinder/format": "^1.0",
+		"fleshgrinder/value": "^1.0",
+		"fleshgrinder/core": "^1.0"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^6.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"Fleshgrinder\\Core\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Fleshgrinder\\Core\\": [
+				"src/",
+				"tests/"
+			]
+		}
+	},
+	"scripts": {
+		"test": "phpunit --colors=always --testdox"
+	}
 }

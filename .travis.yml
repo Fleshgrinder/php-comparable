@@ -1,0 +1,38 @@
+language: php
+
+php:
+  - 7.0
+  - 7.1
+  - nightly
+
+env:
+  global:
+    - COVERAGE_VERSION=7.1
+    - PATH=$TRAVIS_BUILD_DIR/vendor/bin:$PATH
+
+matrix:
+  allow_failures:
+    - php: nightly
+  fast_finish: true
+
+git:
+  depth: 1
+
+branches:
+  only:
+    - master
+
+sudo: false
+cache:
+  directories:
+    - $HOME/.composer/cache
+    - $HOME/bin
+
+install:
+  - composer update --classmap-authoritative --no-interaction --no-progress --no-suggest --prefer-dist
+before_script:
+  - function coverage() { test $TRAVIS_PHP_VERSION = $COVERAGE_VERSION; }
+script:
+  - coverage && phpunit || phpunit --no-coverage
+after_success:
+  - coverage && ./.travis.bash
