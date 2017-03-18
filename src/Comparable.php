@@ -10,10 +10,10 @@ namespace Fleshgrinder\Core;
 use Fleshgrinder\Core\Comparators\Comparator;
 
 /**
- * The **comparable** interface defines the contract for all classes which want
- * to provide custom ordering and thus sorting. Implementers are encouraged to
- * make use of the {@see ComparableTrait} which comes along with this interface
- * to simplify the implementation.
+ * The **comparable** interface defines the contract for all classes that
+ * provide custom ordering and consequently sorting. Implementers are
+ * encouraged to make use of the {@see ComparableTrait}, which comes along with
+ * this interface to simplify the implementation.
  */
 interface Comparable extends Equalable {
 	/**
@@ -50,11 +50,14 @@ interface Comparable extends Equalable {
 	 * `$z`.
 	 *
 	 * It is strongly recommended, but not strictly required that
-	 * `($x->compareTo($y) === 0) === ($x->equals($y))`. Generally speaking,
+	 * `($x->compareTo($y) === 0) === $x->equals($y)`. Generally speaking,
 	 * any class that implements the {@see Comparable} interface and violates
 	 * this condition should clearly indicate this fact. The recommended
 	 * language is "Note: this class has a natural ordering that is
 	 * inconsistent with equals."
+	 *
+	 * Implementers must further ensure that this method does not throw any
+	 * other exceptions than the annotated ones.
 	 *
 	 * @throws \Fleshgrinder\Core\UncomparableException
 	 *     if `$other` is not comparable with this object.

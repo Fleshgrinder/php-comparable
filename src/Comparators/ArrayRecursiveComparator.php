@@ -64,13 +64,7 @@ final class ArrayRecursiveComparator extends Comparator {
 				continue;
 			}
 
-			if ($l_value instanceof Comparable) {
-				$order = $l_value->compareTo($r_value)->toInt();
-			}
-			else {
-				$order = $comparator($l_value, $r_value);
-			}
-
+			$order = $comparator($l_value, $r_value);
 			if ($order !== Ordering::EQ) {
 				return $order;
 			}

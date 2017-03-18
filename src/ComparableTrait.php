@@ -24,13 +24,11 @@ use Fleshgrinder\Core\Comparators\{
  * @mixin \Fleshgrinder\Core\Comparable
  */
 trait ComparableTrait {
+	/* @noinspection PhpDocMissingThrowsInspection */
 	/**
 	 * @see \Fleshgrinder\Core\Comparable::getComparator
 	 * @return callable|\Fleshgrinder\Core\Comparators\Comparator
 	 * @throws \Fleshgrinder\Core\UncomparableException
-	 * @throws \TypeError
-	 *     if the class that uses this trait does not implement the
-	 *     {@see Comparable} interface.
 	 */
 	final public static function getComparator(): Comparator {
 		$class = static::class;
@@ -40,19 +38,18 @@ trait ComparableTrait {
 		// the implementation of defaults in interfaces. However, PHP has
 		// no comparable feature and forces us to implement this check at
 		// runtime. (There were discussions …)
-		$comparable = Comparable::class;
-		if (($class instanceof $comparable) === \false) {
-			throw new \TypeError("{$class} must implement {$comparable}");
-		}
+		\assert(
+			(new \ReflectionClass($class))->implementsInterface(Comparable::CLASS),
+			"{$class} must implement " . Comparable::CLASS
+		);
 
-		return new ComparatorDelegate(static function ($lhs, $rhs) use ($class) {
+		/* @noinspection ExceptionsAnnotatingAndHandlingInspection */
+		return ComparatorDelegate::new(static function ($lhs, $rhs) use ($class): int {
 			if (($lhs instanceof $class) === \false) {
-				/** @noinspection ExceptionsAnnotatingAndHandlingInspection */
 				throw UncomparableException::fromUnexpectedType($class, $lhs);
 			}
 
 			/** @var Comparable $lhs */
-			/** @var Comparable $rhs */
 			return $lhs->compareTo($rhs)->toInt();
 		});
 	}
@@ -61,15 +58,11 @@ trait ComparableTrait {
 	 * @see \Fleshgrinder\Core\Comparable::getReverseComparator
 	 * @return callable|\Fleshgrinder\Core\Comparators\Comparator
 	 * @throws \Fleshgrinder\Core\UncomparableException
-	 * @throws \TypeError
-	 *     if the class that uses this trait does not implement the
-	 *     {@see Comparable} interface.
 	 */
 	final public static function getReverseComparator(): Comparator {
-		return new ReverseComparator(static::getComparator());
+		return ReverseComparator::new(static::getComparator());
 	}
 
-	/** @noinspection PhpDocMissingThrowsInspection */
 	/**
 	 * @see \Fleshgrinder\Core\Comparable::compareTo
 	 * @return \Fleshgrinder\Core\Ordering
@@ -79,7 +72,6 @@ trait ComparableTrait {
 		$ordering = $this->doCompareTo($other);
 
 		if ($ordering instanceof NullOrdering) {
-			/** @noinspection ExceptionsAnnotatingAndHandlingInspection */
 			throw UncomparableException::fromUnexpectedType(static::class, $other);
 		}
 
@@ -115,6 +107,9 @@ trait ComparableTrait {
 	 * Do compare this object with the given other value, this method **should
 	 * not** throw an {@see UncomparableException} as it is used for direct
 	 * chaining. A {@see NullOrdering} should be used as return value instead.
+	 *
+	 * Implementers must ensure that this method does not throw any errors or
+	 * exceptions.
 	 */
 	protected function doCompareTo($other): Ordering {
 		if ($other instanceof $this) {

@@ -9,7 +9,7 @@ declare(strict_types = 1);
 
 namespace Fleshgrinder\Core\Comparators;
 
-use Fleshgrinder\Core\{Comparable, Ordering, UncomparableException, Value};
+use Fleshgrinder\Core\{Ordering, UncomparableException, Value};
 
 /**
  * The **array comparator** may be used to compare unidimensional arrays which
@@ -34,19 +34,14 @@ final class ArrayComparator extends Comparator {
 			return $order;
 		}
 
+		$cmp = new DefaultComparator;
 		foreach ($lhs as $delta => $lhs_item) {
 			if (\array_key_exists($delta, $rhs) === \false) {
 				/** @noinspection ExceptionsAnnotatingAndHandlingInspection */
 				throw UncomparableException::againstVoid($lhs_item, ", key `{$delta}` missing from right-hand side");
 			}
 
-			if ($lhs_item instanceof Comparable) {
-				$order = $lhs_item->compareTo($rhs[$delta])->toInt();
-			}
-			else {
-				$order = $lhs_item <=> $rhs[$delta];
-			}
-
+			$order = $cmp($lhs_item, $rhs[$delta]);
 			if ($order !== Ordering::EQ) {
 				return $order;
 			}
