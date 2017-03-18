@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 final class UncomparableExceptionTest extends TestCase {
 	/**
-	 * @testdox The `againstVoid` constructor correctly sets the `value` and `reason` arguments for formatting.
+	 * @testdox ::againstVoid sets format arguments correctly
 	 * @covers \Fleshgrinder\Core\UncomparableException::againstVoid
 	 */
 	public static function testAgainstVoidMessage() {
@@ -19,7 +19,7 @@ final class UncomparableExceptionTest extends TestCase {
 	}
 
 	/**
-	 * @testdox The `fromIncompatibleTypes` constructor correctly sets the `expected` and `actual` arguments for formatting.
+	 * @testdox ::fromIncompatibleTypes sets format arguments correctly
 	 * @covers \Fleshgrinder\Core\UncomparableException::fromIncompatibleTypes
 	 */
 	public static function testFromIncompatibleTypes() {
@@ -30,7 +30,7 @@ final class UncomparableExceptionTest extends TestCase {
 	}
 
 	/**
-	 * @testdox The `fromUnexpectedType` constructor correctly sets the `expected` and `actual` arguments for formatting.
+	 * @testdox ::fromUnexpectedType sets format arguments correctly
 	 * @covers \Fleshgrinder\Core\UncomparableException::fromUnexpectedType
 	 */
 	public static function testFromUnexpectedType() {
@@ -41,7 +41,7 @@ final class UncomparableExceptionTest extends TestCase {
 	}
 
 	/**
-	 * @testdox The `fromUnexpectedTypes` constructor correctly sets the `expected_type`, `lhs`, and `rhs` arguments for formatting.
+	 * @testdox ::fromUnexpectedTypes sets format arguments correctly
 	 * @covers \Fleshgrinder\Core\UncomparableException::fromUnexpectedTypes
 	 */
 	public static function testFromUnexpectedTypes() {

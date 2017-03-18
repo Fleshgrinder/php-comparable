@@ -28,16 +28,6 @@ class Ordering implements Comparable {
 		$this->order = $order;
 	}
 
-	/** Construct new ordering instance. */
-	public static function new(int $order): self {
-		return new static($order);
-	}
-
-	/** An ordering where a compared value is less than another. */
-	final public static function Less(): self {
-		return new static(self::LT);
-	}
-
 	/** An ordering where a compared value is equal to another. */
 	final public static function Equal(): self {
 		return new static(self::EQ);
@@ -48,6 +38,31 @@ class Ordering implements Comparable {
 		return new static(self::GT);
 	}
 
+	/** An ordering where a compared value is less than another. */
+	final public static function Less(): self {
+		return new static(self::LT);
+	}
+
+	/** Construct new ordering instance. */
+	public static function new(int $order): self {
+		return new static($order);
+	}
+
+	/** Whether this ordering is equal. */
+	public function isEqual(): bool {
+		return $this->order === static::EQ;
+	}
+
+	/** Whether this ordering is greater. */
+	public function isGreater(): bool {
+		return $this->order > static::EQ;
+	}
+
+	/** Whether this ordering is greater or equal. */
+	public function isGreaterOrEqual(): bool {
+		return $this->order >= static::EQ;
+	}
+
 	/** Whether this ordering is less. */
 	public function isLess(): bool {
 		return $this->order < static::EQ;
@@ -56,21 +71,6 @@ class Ordering implements Comparable {
 	/** Whether this ordering is less or equal. */
 	public function isLessOrEqual(): bool {
 		return $this->order <= static::EQ;
-	}
-
-	/** Whether this ordering is equal. */
-	public function isEqual(): bool {
-		return $this->order === static::EQ;
-	}
-
-	/** Whether this ordering is greater or equal. */
-	public function isGreaterOrEqual(): bool {
-		return $this->order >= static::EQ;
-	}
-
-	/** Whether this ordering is greater. */
-	public function isGreater(): bool {
-		return $this->order > static::EQ;
 	}
 
 	/** Returns `$this` when it’s not equal, otherwise returns `$other`. */
@@ -100,20 +100,22 @@ class Ordering implements Comparable {
 	 */
 	public function toReverse(): self {
 		$clone = clone $this;
-		$clone->order -= $this->order;
+
+		$clone->order *= -1;
 
 		return $clone;
 	}
 
 	/** @inheritDoc */
 	protected function doCompareTo($other): self {
-		if ($other instanceof $this) {
-			$other = $other->order;
+		if (\is_int($other)) {
+			$other = new static($other);
 		}
 
-		if (\is_int($other)) {
+		if ($other instanceof $this) {
 			$clone = clone $this;
-			$clone->order -= $other;
+
+			$clone->order = $this->order <=> $other->toInt();
 
 			return $clone;
 		}

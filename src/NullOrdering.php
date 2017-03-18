@@ -39,17 +39,12 @@ final class NullOrdering extends Ordering {
 	}
 
 	/** @inheritDoc */
-	public function isLess(): bool {
-		return \false;
-	}
-
-	/** @inheritDoc */
-	public function isLessOrEqual(): bool {
-		return \false;
-	}
-
-	/** @inheritDoc */
 	public function isEqual(): bool {
+		return \false;
+	}
+
+	/** @inheritDoc */
+	public function isGreater(): bool {
 		return \false;
 	}
 
@@ -59,7 +54,12 @@ final class NullOrdering extends Ordering {
 	}
 
 	/** @inheritDoc */
-	public function isGreater(): bool {
+	public function isLess(): bool {
+		return \false;
+	}
+
+	/** @inheritDoc */
+	public function isLessOrEqual(): bool {
 		return \false;
 	}
 
@@ -80,7 +80,7 @@ final class NullOrdering extends Ordering {
 
 	/** @inheritDoc */
 	public function toReverse(): parent {
-		return $this;
+		return clone $this;
 	}
 
 	/** @inheritDoc */
