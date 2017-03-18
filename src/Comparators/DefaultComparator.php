@@ -13,20 +13,32 @@ use Fleshgrinder\Core\{Comparable, UncomparableException, Value};
 
 /**
  * The default comparator uses PHP’s built-in comparison operation while
- * forwarding to the `compareTo` method if the left-hand side is a comparable.
+ * ensuring type security and forwarding to the `compareTo` method if the
+ * left-hand side is a comparable.
  *
  * ## Examples
  * ```php
+ * use Fleshgrinder\Core\Comparators\DefaultComparator;
+ *
  * $data = [3, 2, 1];
  *
  * usort($data, new DefaultComparator);
  *
- * var_export($data);
- * // array (
- * //   0 => 1,
- * //   1 => 2,
- * //   2 => 3,
- * // )
+ * assert($data === [1, 2, 3]);
+ * ```
+ *
+ * ```php
+ * use Fleshgrinder\Core\{Comparators\DefaultComparator, UncomparableException};
+ *
+ * $data = ['3', 2, 1.0];
+ *
+ * $e = null;
+ * try {
+ *     usort($data, new DefaultComparator);
+ * }
+ * catch (UncomparableException $e) { }
+ *
+ * assert($e instanceof UncomparableException);
  * ```
  */
 final class DefaultComparator extends Comparator {
