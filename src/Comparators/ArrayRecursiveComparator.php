@@ -9,7 +9,7 @@ declare(strict_types = 1);
 
 namespace Fleshgrinder\Core\Comparators;
 
-use Fleshgrinder\Core\{Comparable, Ordering, UncomparableException, Value};
+use Fleshgrinder\Core\{Ordering, UncomparableException, Value};
 
 /**
  * Compare item by item of an arbitrarily nested array or map.
@@ -20,6 +20,11 @@ use Fleshgrinder\Core\{Comparable, Ordering, UncomparableException, Value};
  * to this tradition to indicate what this comparator is capable of.
  */
 final class ArrayRecursiveComparator extends Comparator {
+	/** Construct new array comparator instance. */
+	public static function new(): self {
+		return new static;
+	}
+
 	/** @inheritDoc */
 	public function __invoke($lhs, $rhs): int {
 		if (\is_array($lhs) === \false || \is_array($rhs) === \false) {

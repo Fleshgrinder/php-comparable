@@ -44,7 +44,7 @@ use Fleshgrinder\Core\{Comparable, UncomparableException, Value};
 final class DefaultComparator extends Comparator {
 	/** @inheritDoc */
 	public function __invoke($lhs, $rhs): int {
-		if (Value::getType($lhs) !== Value::getType($rhs)) {
+		if ((\is_object($rhs) && ($lhs instanceof $rhs) === \false) || Value::getType($lhs) !== Value::getType($rhs)) {
 			/** @noinspection ExceptionsAnnotatingAndHandlingInspection */
 			throw UncomparableException::fromIncompatibleTypes($lhs, $rhs);
 		}

@@ -9,12 +9,10 @@ declare(strict_types = 1);
 
 namespace Fleshgrinder\Core\Comparators;
 
-use Fleshgrinder\Core\{Immutable, Ordering};
+use Fleshgrinder\Core\Ordering;
 
 /** Foundation for custom comparators. */
 abstract class Comparator {
-	use Immutable;
-
 	/**
 	 * Compare the left- with the right-hand side.
 	 *

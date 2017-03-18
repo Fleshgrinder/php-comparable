@@ -18,6 +18,11 @@ use Fleshgrinder\Core\{Ordering, UncomparableException, Value};
  * @see \Fleshgrinder\Core\Comparators\ArrayRecursiveComparator
  */
 final class ArrayComparator extends Comparator {
+	/** Construct new array comparator instance. */
+	public static function new(): self {
+		return new static;
+	}
+
 	/** @inheritDoc */
 	public function __invoke($lhs, $rhs): int {
 		if ($lhs === [] && $rhs === []) {
@@ -34,14 +39,14 @@ final class ArrayComparator extends Comparator {
 			return $order;
 		}
 
-		$cmp = new DefaultComparator;
+		$comparator = new DefaultComparator;
 		foreach ($lhs as $delta => $lhs_item) {
 			if (\array_key_exists($delta, $rhs) === \false) {
 				/** @noinspection ExceptionsAnnotatingAndHandlingInspection */
 				throw UncomparableException::againstVoid($lhs_item, ", key `{$delta}` missing from right-hand side");
 			}
 
-			$order = $cmp($lhs_item, $rhs[$delta]);
+			$order = $comparator($lhs_item, $rhs[$delta]);
 			if ($order !== Ordering::EQ) {
 				return $order;
 			}

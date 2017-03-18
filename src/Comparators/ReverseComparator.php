@@ -14,6 +14,10 @@ final class ReverseComparator extends Comparator {
 	/** @var Comparator */
 	private $comparator;
 
+	private function __construct(Comparator $comparator) {
+		$this->comparator = $comparator;
+	}
+
 	/**
 	 * Reverse the given comparator delegate.
 	 *
@@ -21,16 +25,12 @@ final class ReverseComparator extends Comparator {
 	 *     see {@see ComparatorDelegate::fromCallable} for more information.
 	 */
 	public static function fromCallable(callable $delegate): self {
-		return self::new(ComparatorDelegate::new($delegate));
+		return new static(ComparatorDelegate::new($delegate));
 	}
 
 	/** Reverse the given comparator. */
 	public static function new(Comparator $comparator): self {
-		$self = new self;
-
-		$self->comparator = $comparator;
-
-		return $self;
+		return new static($comparator);
 	}
 
 	/** @inheritDoc */

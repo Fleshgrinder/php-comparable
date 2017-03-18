@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 final class ReverseComparatorTest extends TestCase {
 	/**
 	 * @testdox is constructable from a callable
+	 * @covers \Fleshgrinder\Core\Comparators\ReverseComparator::__construct
 	 * @covers \Fleshgrinder\Core\Comparators\ReverseComparator::__invoke
 	 * @covers \Fleshgrinder\Core\Comparators\ReverseComparator::fromCallable
 	 * @covers \Fleshgrinder\Core\Comparators\ReverseComparator::new

@@ -53,6 +53,7 @@ final class ComparableTraitTest extends TestCase {
 	 * @covers \Fleshgrinder\Core\ComparableTrait::getComparator
 	 * @covers \Fleshgrinder\Core\Comparators\ArrayComparator::__invoke
 	 * @covers \Fleshgrinder\Core\Comparators\Comparator::compare
+	 * @covers \Fleshgrinder\Core\Comparators\ComparatorDelegate::__construct
 	 * @covers \Fleshgrinder\Core\Comparators\ComparatorDelegate::__invoke
 	 * @covers \Fleshgrinder\Core\Comparators\ComparatorDelegate::checkCallable
 	 * @covers \Fleshgrinder\Core\Comparators\ComparatorDelegate::new
@@ -81,10 +82,12 @@ final class ComparableTraitTest extends TestCase {
 	 * @covers \Fleshgrinder\Core\ComparableTrait::getReverseComparator
 	 * @covers \Fleshgrinder\Core\Comparators\ArrayComparator::__invoke
 	 * @covers \Fleshgrinder\Core\Comparators\Comparator::compare
+	 * @covers \Fleshgrinder\Core\Comparators\ComparatorDelegate::__construct
 	 * @covers \Fleshgrinder\Core\Comparators\ComparatorDelegate::__invoke
 	 * @covers \Fleshgrinder\Core\Comparators\ComparatorDelegate::checkCallable
 	 * @covers \Fleshgrinder\Core\Comparators\ComparatorDelegate::new
 	 * @covers \Fleshgrinder\Core\Comparators\DefaultComparator::__invoke
+	 * @covers \Fleshgrinder\Core\Comparators\ReverseComparator::__construct
 	 * @covers \Fleshgrinder\Core\Comparators\ReverseComparator::__invoke
 	 * @covers \Fleshgrinder\Core\Comparators\ReverseComparator::new
 	 * @covers \Fleshgrinder\Core\Ordering::__construct

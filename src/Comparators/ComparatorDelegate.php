@@ -19,6 +19,10 @@ final class ComparatorDelegate extends Comparator {
 	/** @var callable */
 	private $delegate;
 
+	private function __construct(callable $delegate) {
+		$this->delegate = $delegate;
+	}
+
 	/**
 	 * Construct new comparator delegate instance.
 	 *
@@ -27,12 +31,9 @@ final class ComparatorDelegate extends Comparator {
 	 *     callable argument do not match the ones from {@see __invoke}.
 	 */
 	public static function new(callable $delegate): self {
-		\assert(self::checkCallable($delegate));
+		\assert(static::checkCallable($delegate));
 
-		$self = new self;
-		$self->delegate = $delegate;
-
-		return $self;
+		return new static($delegate);
 	}
 
 	/** @throws \InvalidArgumentException */
