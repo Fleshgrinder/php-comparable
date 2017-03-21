@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Richard Fussenegger <fleshgrinder@users.noreply.github.com>
+ * @copyright 2017 Richard Fussenegger
+ * @license http://unlicense.org/ Unlicense
+ */
 
 declare(strict_types = 1);
 
@@ -12,7 +17,6 @@ final class ReverseComparatorTest extends TestCase {
 	 * @covers \Fleshgrinder\Core\Comparators\ReverseComparator::__construct
 	 * @covers \Fleshgrinder\Core\Comparators\ReverseComparator::__invoke
 	 * @covers \Fleshgrinder\Core\Comparators\ReverseComparator::fromCallable
-	 * @covers \Fleshgrinder\Core\Comparators\ReverseComparator::new
 	 * @uses \Fleshgrinder\Core\Comparators\ComparatorDelegate
 	 */
 	public static function test() {

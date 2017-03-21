@@ -33,6 +33,6 @@ install:
 before_script:
   - function coverage() { test $TRAVIS_PHP_VERSION = $COVERAGE_VERSION; }
 script:
-  - coverage && phpunit || phpunit --no-coverage
+  - coverage && phpunit --coverage-clover build/logs/clover.xml || phpunit --no-coverage
 after_success:
   - coverage && ./.travis.bash

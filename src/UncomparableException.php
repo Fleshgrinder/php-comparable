@@ -25,23 +25,6 @@ namespace Fleshgrinder\Core;
 class UncomparableException extends \InvalidArgumentException {
 	/* @noinspection PhpDocMissingThrowsInspection */
 	/**
-	 * Construct new uncomparable exception where a value cannot be compared
-	 * against the void bottom type.
-	 *
-	 * @param $value
-	 *     which cannot be compared against the void bottom type.
-	 * @param $reason
-	 *     which explains how it was possible to to get to this situation, it
-	 *     is not common to interact with a bottom type, and the reason is most
-	 *     probably necessary for a user to understand the circumstances.
-	 */
-	public static function againstVoid($value, string $reason = ''): self {
-		/* @noinspection ExceptionsAnnotatingAndHandlingInspection */
-		return new static(Formatter::format('Cannot compare {:?} against void[{1}?]', [$value, $reason]));
-	}
-
-	/* @noinspection PhpDocMissingThrowsInspection */
-	/**
 	 * Construct new uncomparable exception where a comparison of two values
 	 * cannot be compared because they are of incompatible types.
 	 *
@@ -72,25 +55,5 @@ class UncomparableException extends \InvalidArgumentException {
 	public static function fromUnexpectedType(string $expected, $actual): self {
 		/* @noinspection ExceptionsAnnotatingAndHandlingInspection */
 		return new static(Formatter::format('Cannot compare {} with {:?}', [$expected, $actual]));
-	}
-
-	/* @noinspection PhpDocMissingThrowsInspection */
-	/**
-	 * Construct new uncomparable exception where a comparison can be performed
-	 * only if both, left- and right-hand side, are of a fixed type.
-	 *
-	 * @param $expected
-	 *     type for both left- and right-hand side.
-	 * @param $lhs
-	 *     value which might have been the one that was of an unexpected type.
-	 * @param $rhs
-	 *     value which might have been the one that was of an unexpected type.
-	 */
-	public static function fromUnexpectedTypes(string $expected, $lhs, $rhs): self {
-		/* @noinspection ExceptionsAnnotatingAndHandlingInspection */
-		return new static(Formatter::format(
-			'Can compare {}s only, got {:?} for left- and {:?} for right-hand side',
-			[$expected, $lhs, $rhs]
-		));
 	}
 }

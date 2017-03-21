@@ -24,7 +24,8 @@
 	stopOnIncomplete="false"
 	stopOnRisky="false"
 	stopOnSkipped="false"
-	stopOnWarning="false">
+	stopOnWarning="false"
+	verbose="true">
 
 	<filter>
 		<whitelist addUncoveredFilesFromWhitelist="true" processUncoveredFilesFromWhitelist="true">
@@ -41,10 +42,6 @@
 		<ini name="error_reporting" value="32767"/>
 		<ini name="memory_limit" value="-1"/>
 	</php>
-
-	<logging>
-		<log type="coverage-clover" target="build/logs/clover.xml"/>
-	</logging>
 
 	<testsuites>
 		<testsuite name="unit_tests">

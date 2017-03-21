@@ -9,9 +9,8 @@ declare(strict_types = 1);
 
 namespace Fleshgrinder\Core;
 
-use Fleshgrinder\Core\Comparators\{
-	ArrayComparator, Comparator, ComparatorDelegate, ReverseComparator
-};
+use Fleshgrinder\Core\ArrayComparators\RecursiveArrayComparator;
+use Fleshgrinder\Core\Comparators\{Comparator, ComparatorDelegate, ReverseComparator};
 
 /**
  * Default implementation for the {@see Comparable} interface which requires
@@ -31,7 +30,7 @@ trait ComparableTrait {
 	 * @throws \Fleshgrinder\Core\UncomparableException
 	 */
 	final public static function getComparator(): Comparator {
-		$class = static::class;
+		$class = static::CLASS;
 
 		// NOTE that this should actually be a compile time error of PHP and
 		// not a runtime error. Hack has support for this and Java 8 allows
@@ -44,7 +43,7 @@ trait ComparableTrait {
 		);
 
 		/* @noinspection ExceptionsAnnotatingAndHandlingInspection */
-		return ComparatorDelegate::new(static function ($lhs, $rhs) use ($class): int {
+		return new ComparatorDelegate(static function ($lhs, $rhs) use ($class): int {
 			if (($lhs instanceof $class) === \false) {
 				throw UncomparableException::fromUnexpectedType($class, $lhs);
 			}
@@ -60,7 +59,7 @@ trait ComparableTrait {
 	 * @throws \Fleshgrinder\Core\UncomparableException
 	 */
 	final public static function getReverseComparator(): Comparator {
-		return ReverseComparator::new(static::getComparator());
+		return new ReverseComparator(static::getComparator());
 	}
 
 	/**
@@ -72,7 +71,7 @@ trait ComparableTrait {
 		$ordering = $this->doCompareTo($other);
 
 		if ($ordering instanceof NullOrdering) {
-			throw UncomparableException::fromUnexpectedType(static::class, $other);
+			throw UncomparableException::fromUnexpectedType(static::CLASS, $other);
 		}
 
 		return $ordering;
@@ -110,6 +109,11 @@ trait ComparableTrait {
 	 *
 	 * Implementers must ensure that this method does not throw any errors or
 	 * exceptions.
+	 *
+	 * The default implementation uses the {@see RecursiveArrayComparator}, and
+	 * compares all properties of this and the other objects against each other,
+	 * if, and only if, they are instances of the same superclass. Note that
+	 * the properties cannot be nullable, and that all must be set and exist.
 	 */
 	protected function doCompareTo($other): Ordering {
 		if ($other instanceof $this) {
@@ -117,13 +121,13 @@ trait ComparableTrait {
 			$rhs = \get_object_vars($other);
 
 			try {
-				return ArrayComparator::compare($lhs, $rhs);
+				return RecursiveArrayComparator::compare($lhs, $rhs);
 			}
 			catch (UncomparableException $e) {
 				// Fall through!
 			}
 		}
 
-		return NullOrdering::new();
+		return new NullOrdering;
 	}
 }

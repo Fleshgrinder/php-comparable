@@ -9,52 +9,41 @@ declare(strict_types = 1);
 
 namespace Fleshgrinder\Core\Comparators;
 
+use Fleshgrinder\Core\Uncloneable;
+
 /**
  * The **comparator delegate** can be used to quickly create a comparator from
  * a closure or callable without the need to implement a dedicated class or
  * by using an anonymous class (which cannot easily capture surrounding
  * variables).
  */
-final class ComparatorDelegate extends Comparator {
+final class ComparatorDelegate implements Comparator {
+	use Uncloneable;
+
 	/** @var callable */
 	private $delegate;
-
-	private function __construct(callable $delegate) {
-		$this->delegate = $delegate;
-	}
 
 	/**
 	 * Construct new comparator delegate instance.
 	 *
-	 * @throws \InvalidArgumentException
-	 *     if assertions are enabled and the arguments or return type of the
-	 *     callable argument do not match the ones from {@see __invoke}.
+	 * Throws an {@see \AssertionError} if assertions are active and the given
+	 * delegate does not comply with the required method signature:
+	 *
+	 * ```
+	 * $delegate = function ($lhs, $rhs): int { }
+	 * ```
 	 */
-	public static function new(callable $delegate): self {
-		\assert(static::checkCallable($delegate));
+	public function __construct(callable $delegate) {
+		\assert(
+			(static function () use ($delegate) {
+				$reflector = new \ReflectionFunction($delegate);
 
-		return new static($delegate);
-	}
+				return \count($reflector->getParameters()) === 2 && $reflector->getReturnType() == 'int';
+			})(),
+			'Delegate signature is invalid, see ' . __CLASS__ . '::__invoke() for required signature'
+		);
 
-	/** @throws \InvalidArgumentException */
-	public static function checkCallable(callable $delegate): bool {
-		$reflector = new \ReflectionFunction($delegate);
-
-		if (\count($reflector->getParameters()) !== 2) {
-			throw new \InvalidArgumentException(
-				'Delegate must take exactly 2 arguments, see ' . __CLASS__ . '::__invoke() for exact signature'
-			);
-		}
-
-		$return_type = $reflector->getReturnType();
-		$return_type = $return_type ? $return_type->__toString() : 'none';
-		if ($return_type !== 'int') {
-			throw new \InvalidArgumentException(
-				"Delegate return type must be of type int, got {$return_type}, see " . __CLASS__ . '::__invoke() for exact signature'
-			);
-		}
-
-		return \true;
+		$this->delegate = $delegate;
 	}
 
 	/** @inheritDoc */

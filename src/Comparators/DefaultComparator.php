@@ -9,10 +9,12 @@ declare(strict_types = 1);
 
 namespace Fleshgrinder\Core\Comparators;
 
-use Fleshgrinder\Core\{Comparable, UncomparableException, Value};
+use Fleshgrinder\Core\{
+	Comparable, Formatter, Uncloneable, UncomparableException, Value
+};
 
 /**
- * The default comparator uses PHP’s built-in comparison operation while
+ * The **default comparator** uses PHP’s built-in comparison operation while
  * ensuring type security and forwarding to the `compareTo` method if the
  * left-hand side is a comparable.
  *
@@ -41,11 +43,12 @@ use Fleshgrinder\Core\{Comparable, UncomparableException, Value};
  * assert($e instanceof UncomparableException);
  * ```
  */
-final class DefaultComparator extends Comparator {
+final class DefaultComparator implements Comparator {
+	use ComparatorTrait, Uncloneable;
+
 	/** @inheritDoc */
 	public function __invoke($lhs, $rhs): int {
 		if ((\is_object($rhs) && ($lhs instanceof $rhs) === \false) || Value::getType($lhs) !== Value::getType($rhs)) {
-			/** @noinspection ExceptionsAnnotatingAndHandlingInspection */
 			throw UncomparableException::fromIncompatibleTypes($lhs, $rhs);
 		}
 

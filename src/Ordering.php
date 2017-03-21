@@ -9,8 +9,9 @@ declare(strict_types = 1);
 
 namespace Fleshgrinder\Core;
 
+/** An **ordering** is the result of a comparison between two values. */
 class Ordering implements Comparable {
-	use ComparableTrait, Immutable;
+	use ComparableTrait, Disenchant, Uncloneable;
 
 	/** A value is equal to another. */
 	const EQ = 0;
@@ -24,7 +25,7 @@ class Ordering implements Comparable {
 	/** @var int */
 	private $order;
 
-	final protected function __construct(int $order) {
+	public function __construct(int $order) {
 		$this->order = $order;
 	}
 
@@ -41,11 +42,6 @@ class Ordering implements Comparable {
 	/** An ordering where a compared value is less than another. */
 	final public static function Less(): self {
 		return new static(self::LT);
-	}
-
-	/** Construct new ordering instance. */
-	public static function new(int $order): self {
-		return new static($order);
 	}
 
 	/** Whether this ordering is equal. */
@@ -88,7 +84,7 @@ class Ordering implements Comparable {
 
 	/** Get the order this instance corresponds to. */
 	public function toInt(): int {
-		/** @noinspection PhpStrictTypeCheckingInspection */
+		/* @noinspection PhpStrictTypeCheckingInspection */
 		return ($this->order > 0) - ($this->order < 0);
 	}
 
@@ -99,8 +95,7 @@ class Ordering implements Comparable {
 	 * - {@see Greater} becomes {@see Less}
 	 */
 	public function toReverse(): self {
-		$clone = clone $this;
-
+		$clone        = clone $this;
 		$clone->order *= -1;
 
 		return $clone;
@@ -109,17 +104,18 @@ class Ordering implements Comparable {
 	/** @inheritDoc */
 	protected function doCompareTo($other): self {
 		if (\is_int($other)) {
-			$other = new static($other);
+			$clone        = clone $this;
+			$clone->order = $other;
+			$other        = $clone;
 		}
 
 		if ($other instanceof $this) {
-			$clone = clone $this;
-
+			$clone        = clone $this;
 			$clone->order = $this->order <=> $other->toInt();
 
 			return $clone;
 		}
 
-		return NullOrdering::new();
+		return new NullOrdering;
 	}
 }

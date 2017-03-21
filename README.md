@@ -29,19 +29,13 @@ Composer documentation.
 
 ## Usage
 
+### Array Comparator Differences
+the recursive is slower than the non-recursive version
+
+the non-recursive version uses PHP's loose comparison for array items
+
+the recursive version always uses the inner comparator and is thus always type safe
+
 ## Testing
-Open a terminal, enter the project directory and execute the following commands
-to run the [PHPUnit](https://phpunit.de/) tests with your locally installed
-PHP executable. This requires that you have at least `make` 4.0 installed:
-
-```bash
-make
-```
-
-You can also execute the following two commands, in case `make` is not
-available on your system, or too old:
-
-```bash
-composer install
-composer test
-```
+Open a terminal, enter the project directory and execute `make` to run the
+[PHPUnit](https://phpunit.de/) tests with your locally installed PHP executable.

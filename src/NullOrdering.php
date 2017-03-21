@@ -34,8 +34,8 @@ final class NullOrdering extends Ordering {
 	const NIL = -2;
 
 	/** Construct new null ordering instance. */
-	public static function new(int $order = self::NIL): parent {
-		return new static($order);
+	public function __construct() {
+		parent::__construct(static::NIL);
 	}
 
 	/** @inheritDoc */

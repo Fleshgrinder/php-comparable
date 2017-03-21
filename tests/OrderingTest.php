@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Richard Fussenegger <fleshgrinder@users.noreply.github.com>
+ * @copyright 2017 Richard Fussenegger
+ * @license http://unlicense.org/ Unlicense
+ */
 
 declare(strict_types = 1);
 
@@ -6,6 +11,9 @@ namespace Fleshgrinder\Core;
 
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \Fleshgrinder\Core\Ordering::__construct
+ */
 final class OrderingTest extends TestCase {
 	public static function provideEqual() {
 		return ['Ordering::Equal' => [Ordering::Equal()]];
@@ -13,23 +21,23 @@ final class OrderingTest extends TestCase {
 
 	public static function provideGreater() {
 		return [
-			'Ordering::Greater'          => [Ordering::Greater()],
-			'Ordering::new(2)'           => [Ordering::new(2)],
-			'Ordering::new(PHP_INT_MAX)' => [Ordering::new(\PHP_INT_MAX)],
+			'Ordering::Greater'     => [Ordering::Greater()],
+			'Ordering(2)'           => [new Ordering(2)],
+			'Ordering(PHP_INT_MAX)' => [new Ordering(\PHP_INT_MAX)],
 		];
 	}
 
 	public static function provideLess() {
 		return [
-			'Ordering::new(PHP_INT_MIN)' => [Ordering::new(\PHP_INT_MIN)],
-			'Ordering::new(-2)'          => [Ordering::new(-2)],
-			'Ordering::Less'             => [Ordering::Less()],
+			'Ordering(PHP_INT_MIN)' => [new Ordering(\PHP_INT_MIN)],
+			'Ordering(-2)'          => [new Ordering(-2)],
+			'Ordering::Less'        => [Ordering::Less()],
 		];
 	}
 
 	/**
 	 * @testdox is equal if constructed via
-	 * @covers       \Fleshgrinder\Core\Ordering::isEqual
+	 * @covers \Fleshgrinder\Core\Ordering::isEqual
 	 * @dataProvider provideEqual
 	 */
 	public static function testIsEqual(Ordering $ordering) {
@@ -38,7 +46,7 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox is greater if constructed via
-	 * @covers       \Fleshgrinder\Core\Ordering::isGreater
+	 * @covers \Fleshgrinder\Core\Ordering::isGreater
 	 * @dataProvider provideGreater
 	 */
 	public static function testIsGreater(Ordering $ordering) {
@@ -47,7 +55,7 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox is greater or equal if constructed via
-	 * @covers       \Fleshgrinder\Core\Ordering::isGreaterOrEqual
+	 * @covers \Fleshgrinder\Core\Ordering::isGreaterOrEqual
 	 * @dataProvider provideEqual
 	 * @dataProvider provideGreater
 	 */
@@ -57,7 +65,7 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox is less if constructed via
-	 * @covers       \Fleshgrinder\Core\Ordering::isLess
+	 * @covers \Fleshgrinder\Core\Ordering::isLess
 	 * @dataProvider provideLess
 	 */
 	public static function testIsLess(Ordering $ordering) {
@@ -66,7 +74,7 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox is less or equal if constructed via
-	 * @covers       \Fleshgrinder\Core\Ordering::isLessOrEqual
+	 * @covers \Fleshgrinder\Core\Ordering::isLessOrEqual
 	 * @dataProvider provideEqual
 	 * @dataProvider provideLess
 	 */
@@ -76,7 +84,7 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox is not equal if constructed via
-	 * @covers       \Fleshgrinder\Core\Ordering::isEqual
+	 * @covers \Fleshgrinder\Core\Ordering::isEqual
 	 * @dataProvider provideGreater
 	 * @dataProvider provideLess
 	 */
@@ -86,7 +94,7 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox is not greater if constructed via
-	 * @covers       \Fleshgrinder\Core\Ordering::isGreater
+	 * @covers \Fleshgrinder\Core\Ordering::isGreater
 	 * @dataProvider provideEqual
 	 * @dataProvider provideLess
 	 */
@@ -96,7 +104,7 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox is not greater or equal if constructed via
-	 * @covers       \Fleshgrinder\Core\Ordering::isGreaterOrEqual
+	 * @covers \Fleshgrinder\Core\Ordering::isGreaterOrEqual
 	 * @dataProvider provideLess
 	 */
 	public static function testIsNotGreaterOrEqual(Ordering $ordering) {
@@ -105,7 +113,7 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox is not less if constructed via
-	 * @covers       \Fleshgrinder\Core\Ordering::isLess
+	 * @covers \Fleshgrinder\Core\Ordering::isLess
 	 * @dataProvider provideEqual
 	 * @dataProvider provideGreater
 	 */
@@ -115,7 +123,7 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox is not less or equal if constructed via
-	 * @covers       \Fleshgrinder\Core\Ordering::isLessOrEqual
+	 * @covers \Fleshgrinder\Core\Ordering::isLessOrEqual
 	 * @dataProvider provideGreater
 	 */
 	public static function testIsNotLessOrEqual(Ordering $ordering) {
@@ -124,23 +132,19 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox then returns other if equal
-	 * @covers \Fleshgrinder\Core\Ordering::__construct
 	 * @covers \Fleshgrinder\Core\Ordering::Equal
-	 * @covers \Fleshgrinder\Core\Ordering::new
 	 * @covers \Fleshgrinder\Core\Ordering::then
 	 */
 	public static function testThenEqual() {
-		$other = Ordering::new(42);
+		$other = new Ordering(42);
 
 		static::assertSame($other, Ordering::Equal()->then($other));
 	}
 
 	/**
 	 * @testdox then returns self if greater
-	 * @covers \Fleshgrinder\Core\Ordering::__construct
 	 * @covers \Fleshgrinder\Core\Ordering::Greater
 	 * @covers \Fleshgrinder\Core\Ordering::Less
-	 * @covers \Fleshgrinder\Core\Ordering::new
 	 * @covers \Fleshgrinder\Core\Ordering::then
 	 */
 	public static function testThenGreater() {
@@ -151,10 +155,8 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox then returns self if less
-	 * @covers \Fleshgrinder\Core\Ordering::__construct
 	 * @covers \Fleshgrinder\Core\Ordering::Greater
 	 * @covers \Fleshgrinder\Core\Ordering::Less
-	 * @covers \Fleshgrinder\Core\Ordering::new
 	 * @covers \Fleshgrinder\Core\Ordering::then
 	 */
 	public static function testThenLess() {
@@ -165,13 +167,11 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox then with invokes callback if equal
-	 * @covers \Fleshgrinder\Core\Ordering::__construct
 	 * @covers \Fleshgrinder\Core\Ordering::Equal
-	 * @covers \Fleshgrinder\Core\Ordering::new
 	 * @covers \Fleshgrinder\Core\Ordering::thenWith
 	 */
 	public static function testThenWithEqual() {
-		$other = Ordering::new(42);
+		$other = new Ordering(42);
 
 		static::assertSame($other, Ordering::Equal()->thenWith(function () use ($other) {
 			return $other;
@@ -180,9 +180,7 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox then with returns self if greater
-	 * @covers \Fleshgrinder\Core\Ordering::__construct
 	 * @covers \Fleshgrinder\Core\Ordering::Greater
-	 * @covers \Fleshgrinder\Core\Ordering::new
 	 * @covers \Fleshgrinder\Core\Ordering::thenWith
 	 */
 	public static function testThenWithGreater() {
@@ -193,9 +191,7 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox then with returns self if less
-	 * @covers \Fleshgrinder\Core\Ordering::__construct
 	 * @covers \Fleshgrinder\Core\Ordering::Less
-	 * @covers \Fleshgrinder\Core\Ordering::new
 	 * @covers \Fleshgrinder\Core\Ordering::thenWith
 	 */
 	public static function testThenWithLess() {
@@ -218,23 +214,20 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox integer value is always in [-1, 1] even if created with
-	 * @covers       \Fleshgrinder\Core\Ordering::__construct
-	 * @covers       \Fleshgrinder\Core\Ordering::new
-	 * @covers       \Fleshgrinder\Core\Ordering::toInt
+	 * @covers \Fleshgrinder\Core\Ordering::toInt
 	 * @dataProvider provideIntData
 	 */
 	public static function testToInt(int $int) {
-		$ord = Ordering::new($int)->toInt();
+		$ord = (new Ordering($int))->toInt();
 
 		static::assertTrue(Ordering::LT <= $ord && $ord <= Ordering::GT);
 	}
 
 	/**
 	 * @testdox equal stays equal if reversed
-	 * @covers  \Fleshgrinder\Core\Ordering::__construct
-	 * @covers  \Fleshgrinder\Core\Ordering::isEqual
-	 * @covers  \Fleshgrinder\Core\Ordering::Equal
-	 * @covers  \Fleshgrinder\Core\Ordering::toReverse
+	 * @covers \Fleshgrinder\Core\Ordering::isEqual
+	 * @covers \Fleshgrinder\Core\Ordering::Equal
+	 * @covers \Fleshgrinder\Core\Ordering::toReverse
 	 * @depends testIsEqual
 	 * @depends testIsNotEqual
 	 */
@@ -244,8 +237,8 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox greater becomes less if reversing
-	 * @covers       \Fleshgrinder\Core\Ordering::isLess
-	 * @covers       \Fleshgrinder\Core\Ordering::toReverse
+	 * @covers \Fleshgrinder\Core\Ordering::isLess
+	 * @covers \Fleshgrinder\Core\Ordering::toReverse
 	 * @dataProvider provideGreater
 	 * @depends      testIsLess
 	 * @depends      testIsNotLess
@@ -256,10 +249,9 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox less becomes greater if reversing
-	 * @covers       \Fleshgrinder\Core\Ordering::__construct
-	 * @covers       \Fleshgrinder\Core\Ordering::isGreater
-	 * @covers       \Fleshgrinder\Core\Ordering::Less
-	 * @covers       \Fleshgrinder\Core\Ordering::toReverse
+	 * @covers \Fleshgrinder\Core\Ordering::isGreater
+	 * @covers \Fleshgrinder\Core\Ordering::Less
+	 * @covers \Fleshgrinder\Core\Ordering::toReverse
 	 * @dataProvider provideLess
 	 * @depends      testIsGreater
 	 * @depends      testIsNotGreater
@@ -270,29 +262,31 @@ final class OrderingTest extends TestCase {
 
 	public static function provideComparableData() {
 		return [
-			'Less == PHP_INT_MIN'    => [Ordering::Equal(),   Ordering::Less(),    Ordering::new(\PHP_INT_MIN)],
-			'Less == LT - 1'         => [Ordering::Equal(),   Ordering::Less(),    Ordering::new(Ordering::LT - 1)],
+			// @formatter:off
+			'Less == PHP_INT_MIN'    => [Ordering::Equal(),   Ordering::Less(),    new Ordering(\PHP_INT_MIN)],
+			'Less == LT - 1'         => [Ordering::Equal(),   Ordering::Less(),    new Ordering(Ordering::LT - 1)],
 			'Less == Less'           => [Ordering::Equal(),   Ordering::Less(),    Ordering::Less()],
 			'Less < Equal'           => [Ordering::Less(),    Ordering::Less(),    Ordering::Equal()],
 			'Less < Greater'         => [Ordering::Less(),    Ordering::Less(),    Ordering::Greater()],
-			'Less < GT + 1'          => [Ordering::Less(),    Ordering::Less(),    Ordering::new(Ordering::GT + 1)],
-			'Less < PHP_INT_MAX'     => [Ordering::Less(),    Ordering::Less(),    Ordering::new(\PHP_INT_MAX)],
+			'Less < GT + 1'          => [Ordering::Less(),    Ordering::Less(),    new Ordering(Ordering::GT + 1)],
+			'Less < PHP_INT_MAX'     => [Ordering::Less(),    Ordering::Less(),    new Ordering(\PHP_INT_MAX)],
 
-			'Equal > PHP_INT_MIN'    => [Ordering::Greater(), Ordering::Equal(),   Ordering::new(\PHP_INT_MIN)],
-			'Equal > LT - 1'         => [Ordering::Greater(), Ordering::Equal(),   Ordering::new(Ordering::LT - 1)],
+			'Equal > PHP_INT_MIN'    => [Ordering::Greater(), Ordering::Equal(),   new Ordering(\PHP_INT_MIN)],
+			'Equal > LT - 1'         => [Ordering::Greater(), Ordering::Equal(),   new Ordering(Ordering::LT - 1)],
 			'Equal > Less'           => [Ordering::Greater(), Ordering::Equal(),   Ordering::Less()],
 			'Equal == Equal'         => [Ordering::Equal(),   Ordering::Equal(),   Ordering::Equal()],
 			'Equal < Greater'        => [Ordering::Less(),    Ordering::Equal(),   Ordering::Greater()],
-			'Equal < GT + 1'         => [Ordering::Less(),    Ordering::Equal(),   Ordering::new(Ordering::GT + 1)],
-			'Equal < PHP_INT_MAX'    => [Ordering::Less(),    Ordering::Equal(),   Ordering::new(\PHP_INT_MAX)],
+			'Equal < GT + 1'         => [Ordering::Less(),    Ordering::Equal(),   new Ordering(Ordering::GT + 1)],
+			'Equal < PHP_INT_MAX'    => [Ordering::Less(),    Ordering::Equal(),   new Ordering(\PHP_INT_MAX)],
 
-			'Greater > PHP_INT_MIN'  => [Ordering::Greater(), Ordering::Greater(), Ordering::new(\PHP_INT_MIN)],
-			'Greater > LT - 1'       => [Ordering::Greater(), Ordering::Greater(), Ordering::new(Ordering::LT - 1)],
+			'Greater > PHP_INT_MIN'  => [Ordering::Greater(), Ordering::Greater(), new Ordering(\PHP_INT_MIN)],
+			'Greater > LT - 1'       => [Ordering::Greater(), Ordering::Greater(), new Ordering(Ordering::LT - 1)],
 			'Greater > Less'         => [Ordering::Greater(), Ordering::Greater(), Ordering::Less()],
 			'Greater > Equal'        => [Ordering::Greater(), Ordering::Greater(), Ordering::Equal()],
 			'Greater == Greater'     => [Ordering::Equal(),   Ordering::Greater(), Ordering::Greater()],
-			'Greater == GT + 1'      => [Ordering::Equal(),   Ordering::Greater(), Ordering::new(Ordering::GT + 1)],
-			'Greater == PHP_INT_MAX' => [Ordering::Equal(),   Ordering::Greater(), Ordering::new(\PHP_INT_MAX)],
+			'Greater == GT + 1'      => [Ordering::Equal(),   Ordering::Greater(), new Ordering(Ordering::GT + 1)],
+			'Greater == PHP_INT_MAX' => [Ordering::Equal(),   Ordering::Greater(), new Ordering(\PHP_INT_MAX)],
+			// @formatter:on
 		];
 	}
 
@@ -309,6 +303,7 @@ final class OrderingTest extends TestCase {
 
 	public static function provideComparableIntData() {
 		return [
+			// @formatter:off
 			'Less == PHP_INT_MIN'    => [Ordering::Equal(),   Ordering::Less(),    \PHP_INT_MIN],
 			'Less == LT - 1'         => [Ordering::Equal(),   Ordering::Less(),    Ordering::LT - 1],
 			'Less == LT'             => [Ordering::Equal(),   Ordering::Less(),    Ordering::LT],
@@ -332,12 +327,12 @@ final class OrderingTest extends TestCase {
 			'Greater == GT'          => [Ordering::Equal(),   Ordering::Greater(), Ordering::GT],
 			'Greater == GT + 1'      => [Ordering::Equal(),   Ordering::Greater(), Ordering::GT + 1],
 			'Greater == PHP_INT_MAX' => [Ordering::Equal(),   Ordering::Greater(), \PHP_INT_MAX],
+		    // @formatter:on
 		];
 	}
 
 	/**
 	 * @testdox is comparable to integer where
-	 * @covers \Fleshgrinder\Core\Ordering::__construct
 	 * @covers \Fleshgrinder\Core\Ordering::compareTo
 	 * @covers \Fleshgrinder\Core\Ordering::doCompareTo
 	 * @covers \Fleshgrinder\Core\Ordering::toInt
@@ -364,10 +359,8 @@ final class OrderingTest extends TestCase {
 
 	/**
 	 * @testdox is not comparable to other types, e.g.
-	 * @covers       \Fleshgrinder\Core\Ordering::__construct
-	 * @covers       \Fleshgrinder\Core\Ordering::new
-	 * @covers       \Fleshgrinder\Core\Ordering::compareTo
-	 * @covers       \Fleshgrinder\Core\Ordering::doCompareTo
+	 * @covers \Fleshgrinder\Core\Ordering::compareTo
+	 * @covers \Fleshgrinder\Core\Ordering::doCompareTo
 	 * @uses         \Fleshgrinder\Core\NullOrdering
 	 * @uses         \Fleshgrinder\Core\UncomparableException
 	 * @dataProvider provideUncomparableData
@@ -375,6 +368,6 @@ final class OrderingTest extends TestCase {
 	 * @expectedExceptionMessage Cannot compare Fleshgrinder\Core\Ordering with
 	 */
 	public static function testDoCompareToUncomparable($other) {
-		Ordering::new(42)->compareTo($other);
+		(new Ordering(42))->compareTo($other);
 	}
 }
