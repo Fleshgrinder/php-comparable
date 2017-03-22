@@ -9,6 +9,9 @@ env:
   global:
     - COVERAGE_VERSION=7.1
     - PATH=$TRAVIS_BUILD_DIR/vendor/bin:$PATH
+  matrix:
+    - PREFER=--prefer-lowest
+    - PREFER=--prefer-dist
 
 matrix:
   allow_failures:
@@ -29,10 +32,8 @@ cache:
     - $HOME/bin
 
 install:
-  - composer update --classmap-authoritative --no-interaction --no-progress --no-suggest --prefer-dist
-before_script:
-  - function coverage() { test $TRAVIS_PHP_VERSION = $COVERAGE_VERSION; }
+  - composer update --classmap-authoritative --no-interaction --no-progress --no-suggest --optimize-autoloader $PREFER
 script:
-  - coverage && phpunit --coverage-clover build/logs/clover.xml || phpunit --no-coverage
+  - phpunit --coverage-clover build/logs/clover.xml
 after_success:
-  - coverage && ./.travis.bash
+  - [ $TRAVIS_PHP_VERSION = $COVERAGE_VERSION ] && ./.travis.bash

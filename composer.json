@@ -11,7 +11,7 @@
 	"require": {
 		"php": "^7.0",
 		"fleshgrinder/equalable": "^1.0",
-		"fleshgrinder/format": "^1.0",
+		"fleshgrinder/format": "^1.1",
 		"fleshgrinder/value": "^1.0",
 		"fleshgrinder/core": "^1.0"
 	},
