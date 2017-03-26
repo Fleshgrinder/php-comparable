@@ -1,119 +1,166 @@
-.PHONY: clean install metrics test test-70 test-71 update-dist update-lowest
+# ------------------------------------------------------------------------------ Config
 
-XDEBUG := php_xdebug.dll
-ifdef ComSpec
-DEVNUL := NUL
-DEL    := DEL
-DS     := $(strip \\)
-EXT    := .bat
-RM     := RMDIR /Q /S
-WHICH  := WHERE
-else
-DEVNUL := /dev/null
-DEL    := rm
-DS     := /
-EXT    :=
-RM     := rm -r
-WHICH  := command -v
-ifneq ($(OS),Windows_NT)
-XDEBUG := xdebug.so
-endif
-endif
+# ------------------------------------------------------------------------------ Helper
 
-which       = $(shell $(WHICH) $(1) 2>$(DEVNUL))
-has_feature = $(if $(filter $(1),$(.FEATURES)),$(1))
+has_feature = $(if $(filter $1,$(.FEATURES)),$1)
+which       = $(shell command -v $1 2>/dev/null)
 
-LINE         := --------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------ Default
 
-BUILD_DIR    := build
-LOGS_DIR     := $(BUILD_DIR)$(DS)logs
-VENDOR_DIR   := vendor
-COVERAGE_DIR := $(LOGS_DIR)$(DS)coverage
-JUNIT_FILE   := $(LOGS_DIR)$(DS)junit.xml
-METRICS_DIR  := $(LOGS_DIR)$(DS)metrics
-SRC_DIR      := src
+all: test
 
-COMPOSER     := $(call which,composer$(EXT))
-PHPCPD       := $(call which,phpcpd$(EXT))
-PHPMETRICS   := $(call which,phpmetrics$(EXT))
-TEST_CMD     := vendor$(DS)phpunit$(DS)phpunit$(DS)phpunit --colors=always
+# ------------------------------------------------------------------------------ Help
 
-COMPOSER_ARGS := --no-plugins --no-progress --no-scripts --no-suggest
-PHP_ARGS      := -dzend.assertions=1 -dzend_extension=$(XDEBUG) -dxdebug.coverage_enable=1
+define HELP =
+Usage: make [TARGET]
 
-PHP70 := $(call which,php70$(EXT))
+Targets:
+    clean         remove ALL build artifacts and dependencies
+    help          `list` alias
+    install       `update` alias
+    list          list available make targets
+    phpcpd        analyze PHP code for violations of the DRY principle
+    phpmetrics    analyze PHP files and create a PhpMetrics report
+    test          run ALL tests
+    test-70       run tests with PHP 7.0
+    test-71       run tests with PHP 7.1
+    up-dist       `update` alias
+    up-low        update dependencies to LOWEST versions
+    update        update dependencies to LATEST versions
+
+The following sequence of targets is executed if no target is given:
+
+1. up-dist
+2. test-70 + test-71
+3. up-low
+4. test-70 + test-71
+5. phpmetrics
+6. phpcpd
+
+Both `test-70` and `test-71` require that the respective PHP executables are
+in PATH as either `php70` or `php7.0`, and `php71` or `php7.1`. The former is
+the default on Mac systems with brew and the later is the default on Ubuntu
+systems. Windows users are encouraged to ensure that the executables are to be
+found as `php70`/`php71` to ensure that the do not collide with the executables
+of the Linux subsystem.
+
+`composer test` will be executed, if the PHP executables are no in PATH as
+described in the previous paragraph.
+
+The `phpmetrics` and `phpcpd` targets require that their respective executables
+are in PATH.
+
+endef
+
+help: list
+
+.PHONY: list
+list:
+	@: $(info $(HELP))
+
+# ------------------------------------------------------------------------------ Composer
+
+VENDOR_DIR      := vendor/
+AUTOLOAD_SCRIPT := $(VENDOR_DIR)autoload.php
+COMPOSER_DIST   := $(VENDOR_DIR).dist
+COMPOSER_JSON   := composer.json
+COMPOSER_LOCK   := composer.lock
+COMPOSER_LOWEST := $(VENDOR_DIR).lowest
+
+define composer_up =
+$(call which,composer) update --no-plugins --no-progress --no-scripts --no-suggest --prefer-$(subst .,,$(suffix $@))
+[ $@ == $(COMPOSER_DIST) ] && rm -f $(COMPOSER_LOW) || rm -f $(COMPOSER_DIST)
+touch $@
+endef
+
+install: $(AUTOLOAD_SCRIPT)
+up-dist: $(COMPOSER_DIST)
+up-low: $(COMPOSER_LOWEST)
+update: $(COMPOSER_DIST)
+
+$(AUTOLOAD_SCRIPT): $(COMPOSER_LOCK)
+$(COMPOSER_LOCK): $(COMPOSER_JSON)
+$(COMPOSER_JSON): $(COMPOSER_DIST)
+
+$(COMPOSER_DIST):
+	$(composer_up)
+
+$(COMPOSER_LOWEST):
+	$(composer_up)
+
+# ------------------------------------------------------------------------------ Testing
+
+PHPUNIT_CONFIG := phpunit.xml.dist
+
+PHP70 := $(call which,php70)
 ifeq ($(PHP70),)
-PHP70 := $(call which,php7.0$(EXT))
+PHP70 := $(call which,php7.0)
 ifeq ($(PHP70),)
 PHP70 :=
 endif
 endif
 
-PHP71 := $(call which,php71$(EXT))
+PHP71 := $(call which,php71)
 ifeq ($(PHP71),)
-PHP71 := $(call which,php7.1$(EXT))
+PHP71 := $(call which,php7.1)
 ifeq ($(PHP71),)
 PHP71 :=
 endif
 endif
 
-all: | test metrics
-
-clean:
-ifneq ($(wildcard $(BUILD_DIR)),)
-	$(RM) $(BUILD_DIR)
-endif
-ifneq ($(wildcard $(VENDOR_DIR)),)
-	$(RM) $(VENDOR_DIR)
-endif
-ifneq ($(wildcard composer.lock)),)
-	$(DEL) composer.lock
-endif
-
-install: composer.json
-	$(COMPOSER) install $(COMPOSER_ARGS) --prefer-dist
-
-metrics:
-ifneq ($(PHPMETRICS),)
-ifneq ($(wildcard $(METRICS_DIR)),)
-	$(RM) $(METRICS_DIR)
-endif
-ifeq ($(wildcard $(JUNIT_FILE)),)
-	$(PHPMETRICS) --report-html=$(METRICS_DIR) $(SRC_DIR)
-else
-	$(PHPMETRICS) --report-html=$(METRICS_DIR) --junit=$(JUNIT_FILE) $(SRC_DIR)
-endif
-endif
-ifneq ($(PHPCPD),)
-	$(PHPCPD) --fuzzy --min-tokens=10 $(SRC_DIR)
-endif
-
-test: phpunit.xml.dist
+test: $(PHPUNIT_CONFIG)
 ifeq ($(and $(PHP70),$(PHP71)),)
 	$(COMPOSER) test
 else
 ifeq ($(call has_feature,output-sync),)
-	make update-lowest test-70 test-71 update-dist test-70 test-71
+	$(MAKE) up-low test-70 test-71
+	$(MAKE) up-dist test-70 test-71
 else
-	make update-lowest
-	make -j2 -O test-70 test-71
-	make update-dist
-	make -j2 -O test-70 test-71
+	$(MAKE) up-low
+	$(MAKE) -j2 -O test-70 test-71
+	$(MAKE) up-dist
+	$(MAKE) -j2 -O test-70 test-71
 endif
 endif
 
-test-70: phpunit.xml.dist
-	$(PHP70) $(PHP_ARGS) $(TEST_CMD) --coverage-text=$(BUILD_DIR)$(DS)phpunit.tmp
-	$(DEL) $(BUILD_DIR)$(DS)phpunit.tmp
+BUILD_DIR  := build/
+LOGS_DIR   := $(BUILD_DIR)logs/
+HTML_DIR   := $(LOGS_DIR)coverage/
+JUNIT_FILE := $(LOGS_DIR)junit.xml
+TEST_DIR   := tests/
+PHPUNIT    := vendor/phpunit/phpunit/phpunit --colors=always
 
-test-71: phpunit.xml.dist
-ifneq ($(wildcard $(COVERAGE_DIR)),)
-	$(RM) $(COVERAGE_DIR)
+ifeq ($(OS),Windows_NT)
+php_extension = php_$1.dll
+else
+php_extension = $1.so
 endif
-	$(PHP71) $(PHP_ARGS) $(TEST_CMD) --coverage-html $(COVERAGE_DIR) --log-junit $(JUNIT_FILE)
 
-update-dist: composer.json
-	$(COMPOSER) update $(COMPOSER_ARGS) --prefer-dist
+PHP_ARGS := -dzend.assertions=1 -dzend_extension=$(call php_extension,xdebug) -dxdebug.coverage_enable=1
+PHP70    := $(PHP70) $(PHP_ARGS)
+PHP71    := $(PHP71) $(PHP_ARGS)
 
-update-lowest: composer.json
-	$(COMPOSER) update $(COMPOSER_ARGS) --prefer-lowest
+test-70: $(PHPUNIT_CONFIG)
+	$(PHP70) $(PHPUNIT) --coverage-text=$(BUILD_DIR)/.$@.tmp
+	@ $(RM) $(BUILD_DIR)/.$@.tmp
+
+$(JUNIT_FILE): test-71
+test-71: $(PHPUNIT_CONFIG)
+	$(PHP71) $(PHPUNIT) --coverage-html $(HTML_DIR) --log-junit $(JUNIT_FILE)
+
+# ------------------------------------------------------------------------------ Analysis
+
+SRC_DIR     := src/
+METRICS_DIR := $(LOGS_DIR)metrics/
+
+phpmetrics: $(JUNIT_FILE)
+	$(call which,phpmetrics) --report-html=$(METRICS_DIR) --junit=$(JUNIT_FILE) $(SRC_DIR)
+
+phpcpd:
+	$(call which,phpcpd) --fuzzy --min-tokens=10 $(SRC_DIR)
+
+# ------------------------------------------------------------------------------ Clean-up
+
+.PHONY: clean
+clean:
+	rm -fr $(BUILD_DIR) $(VENDOR_DIR) $(COMPOSER_LOCK)

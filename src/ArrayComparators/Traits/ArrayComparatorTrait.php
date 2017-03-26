@@ -9,8 +9,12 @@ declare(strict_types = 1);
 
 namespace Fleshgrinder\Core\ArrayComparators\Traits;
 
-use Fleshgrinder\Core\{Formatter, Ordering, Uncloneable, UncomparableException};
-use Fleshgrinder\Core\Comparators\{Comparator, ComparatorTrait};
+use Fleshgrinder\Core\{
+	Disenchant, Ordering, Uncloneable, UncomparableException
+};
+use Fleshgrinder\Core\Comparators\{
+	Comparator, ComparatorTrait
+};
 
 /**
  * The **array comparator trait** provides the algorithm that all array
@@ -18,7 +22,7 @@ use Fleshgrinder\Core\Comparators\{Comparator, ComparatorTrait};
  * alter the behavior of the algorithm at various stages.
  */
 trait ArrayComparatorTrait {
-	use ComparatorTrait, Uncloneable;
+	use ComparatorTrait, Disenchant, Uncloneable;
 
 	/** @var Comparator which is used to compare individual items. */
 	private $comparator;
@@ -72,10 +76,10 @@ trait ArrayComparatorTrait {
 
 		if (\is_array($lhs) === \false || \is_array($rhs) === \false) {
 			/* @noinspection ExceptionsAnnotatingAndHandlingInspection */
-			throw new UncomparableException(Formatter::format(
+			throw UncomparableException::new(
 				'Can compare arrays only, got {:?} for left- and {:?} for right-hand side',
 				[$lhs, $rhs]
-			));
+			);
 		}
 
 		$l_len = \count($lhs);

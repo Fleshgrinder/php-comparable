@@ -9,18 +9,22 @@ declare(strict_types = 1);
 
 namespace Fleshgrinder\Core\Comparators;
 
-use Fleshgrinder\Core\Uncloneable;
+use Fleshgrinder\Core\Immutable;
 
 /** The **reverse comparator** can be used to reverse any comparator. */
 final class ReverseComparator implements Comparator {
-	use Uncloneable;
+	use Immutable;
 
 	/** @var Comparator */
 	private $comparator;
 
 	/** Reverse the given comparator. */
-	public function __construct(Comparator $comparator) {
-		$this->comparator = $comparator;
+	public static function new(Comparator $comparator): self {
+		$self = new static;
+
+		$self->comparator = $comparator;
+
+		return $self;
 	}
 
 	/**
@@ -30,7 +34,7 @@ final class ReverseComparator implements Comparator {
 	 *     see {@see ComparatorDelegate::fromCallable} for more information.
 	 */
 	public static function fromCallable(callable $delegate): self {
-		return new static(new ComparatorDelegate($delegate));
+		return static::new(ComparatorDelegate::new($delegate));
 	}
 
 	/** @inheritDoc */

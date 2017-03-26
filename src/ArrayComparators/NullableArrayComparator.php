@@ -7,12 +7,14 @@
 
 namespace Fleshgrinder\Core\ArrayComparators;
 
-use Fleshgrinder\Core\ArrayComparators\Traits\{ArrayComparatorTrait, NullableComparatorTrait, StrictArrayComparatorTrait};
+use Fleshgrinder\Core\ArrayComparators\Traits\{
+	ArrayComparatorTrait, NullableComparatorTrait, StrictArrayComparatorTrait
+};
 use Fleshgrinder\Core\Comparators\Comparator;
 
 /**
  * The **nullable array comparator** compares unidimensional arrays with an
- * equal amount of items and matching nullable types.
+ * equal amount of elements and matching nullable types.
  */
 final class NullableArrayComparator implements Comparator {
 	use ArrayComparatorTrait,

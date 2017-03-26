@@ -17,11 +17,12 @@ final class ReverseComparatorTest extends TestCase {
 	 * @covers \Fleshgrinder\Core\Comparators\ReverseComparator::__construct
 	 * @covers \Fleshgrinder\Core\Comparators\ReverseComparator::__invoke
 	 * @covers \Fleshgrinder\Core\Comparators\ReverseComparator::fromCallable
+	 * @covers \Fleshgrinder\Core\Comparators\ReverseComparator::new
 	 * @uses \Fleshgrinder\Core\Comparators\ComparatorDelegate
 	 */
 	public static function test() {
-		static::assertSame(42, ReverseComparator::fromCallable(function ($lhs, $rhs): int {
-			return $lhs + $rhs;
-		})(21, 21));
+		static::assertSame(0, ReverseComparator::fromCallable(static function ($lhs, $rhs): int {
+			return $lhs <=> $rhs;
+		})(42, 42));
 	}
 }

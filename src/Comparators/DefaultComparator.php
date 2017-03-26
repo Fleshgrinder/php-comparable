@@ -10,41 +10,17 @@ declare(strict_types = 1);
 namespace Fleshgrinder\Core\Comparators;
 
 use Fleshgrinder\Core\{
-	Comparable, Formatter, Uncloneable, UncomparableException, Value
+	Comparable, Immutable, UncomparableException, Value
 };
 
 /**
- * The **default comparator** uses PHP’s built-in comparison operation while
- * ensuring type security and forwarding to the `compareTo` method if the
- * left-hand side is a comparable.
- *
- * ## Examples
- * ```php
- * use Fleshgrinder\Core\Comparators\DefaultComparator;
- *
- * $data = [3, 2, 1];
- *
- * usort($data, new DefaultComparator);
- *
- * assert($data === [1, 2, 3]);
- * ```
- *
- * ```php
- * use Fleshgrinder\Core\{Comparators\DefaultComparator, UncomparableException};
- *
- * $data = ['3', 2, 1.0];
- *
- * $e = null;
- * try {
- *     usort($data, new DefaultComparator);
- * }
- * catch (UncomparableException $e) { }
- *
- * assert($e instanceof UncomparableException);
- * ```
+ * The **default comparator** ensures type-safety while comparing values. It
+ * forwards to the {@see Comparable::compareTo} method if the left-hand side
+ * is an instance of {@see Comparable}, and uses the built-in spaceship operator
+ * (`<=>`) for comparisons of other values.
  */
 final class DefaultComparator implements Comparator {
-	use ComparatorTrait, Uncloneable;
+	use ComparatorTrait, Immutable;
 
 	/** @inheritDoc */
 	public function __invoke($lhs, $rhs): int {

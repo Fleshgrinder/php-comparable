@@ -10,124 +10,130 @@ declare(strict_types = 1);
 namespace Fleshgrinder\Core;
 
 use Fleshgrinder\Core\ArrayComparators\RecursiveArrayComparator;
-use Fleshgrinder\Core\Comparators\{Comparator, ComparatorDelegate, ReverseComparator};
+use Fleshgrinder\Core\Comparators\{
+	Comparator, ComparatorDelegate, ReverseComparator
+};
 
 /**
- * Default implementation for the {@see Comparable} interface which requires
- * implementers to define a single method only, the {@see doCompareTo}.
+ * Default implementation for the {@see Comparable} interface.
  *
- * @internal The final method modifier has no effect on the methods since this
- *     is a trait, however, it removes the methods from the _override method_
- *     completion list of IDEs and – at least – makes it impossible that
- *     subclasses of the class that uses the trait overwrite the methods.
+ * It provides default implementations for all methods of the {@see Comparable}
+ * interface, and it will produce a lexicographic ordering based on the
+ * top-to-bottom declaration of the object’s properties. It uses the
+ * {@see RecursiveArrayComparator} to do so.
+ *
  * @mixin \Fleshgrinder\Core\Comparable
+ * @see \Fleshgrinder\Core\Comparable
+ * @see \Fleshgrinder\Core\ArrayComparators\RecursiveArrayComparator
  */
 trait ComparableTrait {
-	/* @noinspection PhpDocMissingThrowsInspection */
 	/**
 	 * @see \Fleshgrinder\Core\Comparable::getComparator
 	 * @return callable|\Fleshgrinder\Core\Comparators\Comparator
-	 * @throws \Fleshgrinder\Core\UncomparableException
 	 */
-	final public static function getComparator(): Comparator {
-		$class = static::CLASS;
-
-		// NOTE that this should actually be a compile time error of PHP and
-		// not a runtime error. Hack has support for this and Java 8 allows
-		// the implementation of defaults in interfaces. However, PHP has
-		// no comparable feature and forces us to implement this check at
-		// runtime. (There were discussions …)
+	public static function getComparator(): Comparator {
 		\assert(
-			(new \ReflectionClass($class))->implementsInterface(Comparable::CLASS),
-			"{$class} must implement " . Comparable::CLASS
+			(new \ReflectionClass(static::CLASS))->implementsInterface(Comparable::CLASS),
+			static::CLASS . ' must implement ' . Comparable::CLASS
 		);
 
-		/* @noinspection ExceptionsAnnotatingAndHandlingInspection */
-		return new ComparatorDelegate(static function ($lhs, $rhs) use ($class): int {
-			if (($lhs instanceof $class) === \false) {
-				throw UncomparableException::fromUnexpectedType($class, $lhs);
+		return ComparatorDelegate::new(static function ($lhs, $rhs): int {
+			if (\is_a($lhs, static::CLASS)) {
+				/* @noinspection PhpUndefinedMethodInspection */
+				return $lhs->compareTo($rhs)->toInt();
 			}
 
-			/** @var Comparable $lhs */
-			return $lhs->compareTo($rhs)->toInt();
+			/* @noinspection ExceptionsAnnotatingAndHandlingInspection */
+			throw UncomparableException::new(
+				'Expected {} but got {:?} on left-hand side',
+				[static::CLASS, $lhs]
+			);
 		});
 	}
 
 	/**
 	 * @see \Fleshgrinder\Core\Comparable::getReverseComparator
 	 * @return callable|\Fleshgrinder\Core\Comparators\Comparator
-	 * @throws \Fleshgrinder\Core\UncomparableException
 	 */
-	final public static function getReverseComparator(): Comparator {
-		return new ReverseComparator(static::getComparator());
+	public static function getReverseComparator(): Comparator {
+		return ReverseComparator::new(static::getComparator());
 	}
 
 	/**
 	 * @see \Fleshgrinder\Core\Comparable::compareTo
-	 * @return \Fleshgrinder\Core\Ordering
 	 * @throws \Fleshgrinder\Core\UncomparableException
 	 */
-	final public function compareTo($other): Ordering {
-		$ordering = $this->doCompareTo($other);
-
-		if ($ordering instanceof NullOrdering) {
-			throw UncomparableException::fromUnexpectedType(static::CLASS, $other);
+	public function compareTo($other): Ordering {
+		if ($other instanceof $this) {
+			/* @noinspection PhpParamsInspection */
+			return $this->compareTypeSafeTo($other);
 		}
 
-		return $ordering;
+		throw UncomparableException::fromIncompatibleTypes($this, $other);
 	}
 
 	/** @see \Fleshgrinder\Core\Comparable::isLessThan */
-	final public function isLessThan($other): bool {
-		return $this->doCompareTo($other)->isLess();
+	public function isLessThan($other): bool {
+		try {
+			return $this->compareTo($other)->isLess();
+		}
+		catch (UncomparableException $_) {
+			return \false;
+		}
 	}
 
 	/** @see \Fleshgrinder\Core\Comparable::isLessThanOrEquals */
-	final public function isLessThanOrEquals($other): bool {
-		return $this->doCompareTo($other)->isLessOrEqual();
+	public function isLessThanOrEquals($other): bool {
+		try {
+			return $this->compareTo($other)->isLessOrEqual();
+		}
+		catch (UncomparableException $_) {
+			return \false;
+		}
 	}
 
 	/** @see \Fleshgrinder\Core\Equalable::equals */
-	final public function equals($other): bool {
-		return $this->doCompareTo($other)->isEqual();
+	public function equals($other): bool {
+		try {
+			return $this->compareTo($other)->isEqual();
+		}
+		catch (UncomparableException $_) {
+			return \false;
+		}
 	}
 
 	/** @see \Fleshgrinder\Core\Comparable::isGreaterThanOrEquals */
-	final public function isGreaterThanOrEquals($other): bool {
-		return $this->doCompareTo($other)->isGreaterOrEqual();
+	public function isGreaterThanOrEquals($other): bool {
+		try {
+			return $this->compareTo($other)->isGreaterOrEqual();
+		}
+		catch (UncomparableException $_) {
+			return \false;
+		}
 	}
 
 	/** @see \Fleshgrinder\Core\Comparable::isGreaterThan */
-	final public function isGreaterThan($other): bool {
-		return $this->doCompareTo($other)->isGreater();
+	public function isGreaterThan($other): bool {
+		try {
+			return $this->compareTo($other)->isGreater();
+		}
+		catch (UncomparableException $_) {
+			return \false;
+		}
 	}
 
 	/**
-	 * Do compare this object with the given other value, this method **should
-	 * not** throw an {@see UncomparableException} as it is used for direct
-	 * chaining. A {@see NullOrdering} should be used as return value instead.
+	 * Compare this object with the given other object for order.
 	 *
-	 * Implementers must ensure that this method does not throw any errors or
-	 * exceptions.
+	 * This hook is called in {@see compareTo} after checking that the other
+	 * given value is an instance of this object.
 	 *
-	 * The default implementation uses the {@see RecursiveArrayComparator}, and
-	 * compares all properties of this and the other objects against each other,
-	 * if, and only if, they are instances of the same superclass. Note that
-	 * the properties cannot be nullable, and that all must be set and exist.
+	 * @throws \Fleshgrinder\Core\UncomparableException
 	 */
-	protected function doCompareTo($other): Ordering {
-		if ($other instanceof $this) {
-			$lhs = \get_object_vars($this);
-			$rhs = \get_object_vars($other);
-
-			try {
-				return RecursiveArrayComparator::compare($lhs, $rhs);
-			}
-			catch (UncomparableException $e) {
-				// Fall through!
-			}
-		}
-
-		return new NullOrdering;
+	protected function compareTypeSafeTo(self $other): Ordering {
+		return RecursiveArrayComparator::compare(
+			\get_object_vars($this),
+			\get_object_vars($other)
+		);
 	}
 }

@@ -26,7 +26,7 @@ trait RecursiveArrayComparatorTrait {
 	use ArrayComparatorTrait;
 
 	/** @inheritDoc */
-	protected static function doCompare(callable $comparator, array $lhs, array $rhs): int {
+	final protected static function doCompare(callable $comparator, array $lhs, array $rhs): int {
 		$l_stack = [$lhs];
 		$r_stack = [$rhs];
 
@@ -41,34 +41,41 @@ trait RecursiveArrayComparatorTrait {
 			$r_val = $r_stack[$ptr][$key];
 
 			if (\is_array($l_val) && \is_array($r_val)) {
-				if ($l_val !== [] && $r_val !== []) {
-					$l_len = \count($l_val);
-					$r_len = \count($r_val);
-					$order = $l_len <=> $r_len;
-
-					if ($order !== Ordering::EQ) {
-						return static::handleSizeMismatch($l_len, $r_len, $order);
-					}
-
-					$l_stack[] =& $l_stack[$ptr][$key];
-					$r_stack[] =& $r_stack[$ptr][$key];
-					++$ptr;
-
-					continue;
+				if ($l_val === [] && $r_val === []) {
+					goto pop_stack;
 				}
-			}
-			else {
-				$order = $comparator($l_val, $r_val);
+
+				$l_len = \count($l_val);
+				$r_len = \count($r_val);
+				$order = $l_len <=> $r_len;
+
 				if ($order !== Ordering::EQ) {
-					return $order;
+					return static::handleSizeMismatch($l_len, $r_len, $order);
 				}
+
+				// Note that simply appending will not work at this point,
+				// because the array is not re-indexed if an element is
+				// removed (see unset below). This is why the index must
+				// be specified explicitly.
+				$l_stack[$ptr + 1] =& $l_stack[$ptr][$key];
+				$r_stack[$ptr + 1] =& $r_stack[$ptr][$key];
+				++$ptr;
+
+				continue;
 			}
 
-			unset($l_stack[$ptr][$key], $r_stack[$ptr][$key]);
+			$order = $comparator($l_val, $r_val);
+			if ($order !== Ordering::EQ) {
+				return $order;
+			}
 
-			if (!$l_stack[$ptr]) {
-				unset($l_stack[$ptr], $r_stack[$ptr]);
-				--$ptr;
+			pop_stack: {
+				unset($l_stack[$ptr][$key], $r_stack[$ptr][$key]);
+
+				if (!$l_stack[$ptr]) {
+					unset($l_stack[$ptr], $r_stack[$ptr]);
+					--$ptr;
+				}
 			}
 		}
 

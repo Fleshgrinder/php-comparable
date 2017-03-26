@@ -7,13 +7,17 @@
 
 namespace Fleshgrinder\Core\ArrayComparators;
 
-use Fleshgrinder\Core\ArrayComparators\Traits\{DefaultComparatorTrait, RecursiveArrayComparatorTrait, SparseArrayComparatorTrait};
+use Fleshgrinder\Core\ArrayComparators\Traits\{
+	DefaultComparatorTrait, RecursiveArrayComparatorTrait, SparseArrayComparatorTrait
+};
 use Fleshgrinder\Core\Comparators\Comparator;
 
 /**
  * The **sparse recursive array comparator** compares multidimensional arrays
- * with an unequal amount of items and matching types.
+ * with an unequal amount of elements and matching types.
  */
 final class SparseRecursiveArrayComparator implements Comparator {
-	use DefaultComparatorTrait, RecursiveArrayComparatorTrait, SparseArrayComparatorTrait;
+	use DefaultComparatorTrait,
+		RecursiveArrayComparatorTrait,
+		SparseArrayComparatorTrait;
 }

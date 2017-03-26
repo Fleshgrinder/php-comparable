@@ -11,6 +11,7 @@ namespace Fleshgrinder\Core\Comparators;
 
 use PHPUnit\Framework\TestCase;
 
+/** @covers \Fleshgrinder\Core\Comparators\ComparatorDelegate::new */
 final class ComparatorDelegateTest extends TestCase {
 	public static function provideDelegates() {
 		return [
@@ -24,12 +25,63 @@ final class ComparatorDelegateTest extends TestCase {
 
 	/**
 	 * @testdox throws AssertionError if delegate signature does not match required signature
-	 * @covers \Fleshgrinder\Core\Comparators\ComparatorDelegate::__construct
 	 * @dataProvider provideDelegates
 	 * @expectedException \AssertionError
 	 * @expectedExceptionMessage Delegate signature is invalid, see Fleshgrinder\Core\Comparators\ComparatorDelegate::__invoke() for required signature
 	 */
 	public static function testNewAssertionError(callable $delegate) {
-		new ComparatorDelegate($delegate);
+		ComparatorDelegate::new($delegate);
+	}
+
+	/**
+	 * @testdox catches TypeErrors and transforms them into Fleshgrinder\Core\UncomparableExceptions
+	 * @covers \Fleshgrinder\Core\Comparators\ComparatorDelegate::__invoke
+	 * @covers \Fleshgrinder\Core\UncomparableException::new
+	 * @expectedException \Fleshgrinder\Core\UncomparableException
+	 * @expectedExceptionMessage Expected DateTime but got null on left- and integer on right-hand side
+	 */
+	public static function testTypeErrorClassHandling() {
+		ComparatorDelegate::new(static function (\DateTime $lhs, \DateTime $rhs): int {
+			throw new \BadMethodCallException;
+		})(\null, 42);
+	}
+
+	/**
+	 * @testdox catches TypeErrors and transforms them into Fleshgrinder\Core\UncomparableExceptions
+	 * @covers \Fleshgrinder\Core\Comparators\ComparatorDelegate::__invoke
+	 * @covers \Fleshgrinder\Core\UncomparableException::new
+	 * @expectedException \Fleshgrinder\Core\UncomparableException
+	 * @expectedExceptionMessage Expected int but got null on left- and integer on right-hand side
+	 */
+	public static function testTypeErrorTypeHandling() {
+		ComparatorDelegate::new(static function (int $lhs, int $rhs): int {
+			throw new \BadMethodCallException;
+		})(\null, 42);
+	}
+
+	public static function throwTypeError() {
+		throw new \TypeError('test');
+	}
+
+	public static function provideTypeErrorRethrowingData() {
+		return [
+			[static function ($lhs, $rhs): int {
+				throw new \TypeError('test');
+			}],
+			[static function ($lhs, $rhs): int {
+				static::throwTypeError();
+			}],
+		];
+	}
+
+	/**
+	 * @testdox does not catch unrelated TypeErrors and simply rethrows them
+	 * @covers \Fleshgrinder\Core\Comparators\ComparatorDelegate::__invoke
+	 * @dataProvider provideTypeErrorRethrowingData
+	 * @expectedException \TypeError
+	 * @expectedExceptionMessage test
+	 */
+	public static function testTypeErrorRethrowing(callable $delegate) {
+		ComparatorDelegate::new($delegate)(\null, \null);
 	}
 }

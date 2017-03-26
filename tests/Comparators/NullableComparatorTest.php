@@ -12,20 +12,24 @@ namespace Fleshgrinder\Core\Comparators;
 use Fleshgrinder\Core\Ordering;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \Fleshgrinder\Core\Comparators\NullableComparator::__invoke
+ * @covers \Fleshgrinder\Core\Comparators\NullableComparator::compare
+ */
 final class NullableComparatorTest extends TestCase {
-	public static function provide() {
+	public static function provideComparableData() {
 		return [
-			'null <=> null = EQ'  => [Ordering::EQ, \null, \null],
-			'null <=> mixed = LT' => [Ordering::LT, \null, 'mixed'],
-			'mixed <=> null = GT' => [Ordering::GT, 'mixed', \null],
+			'null <=> null = EQ'  => [Ordering::Equal(), \null, \null],
+			'null <=> mixed = LT' => [Ordering::Less(), \null, 'mixed'],
+			'mixed <=> null = GT' => [Ordering::Greater(), 'mixed', \null],
 		];
 	}
 
 	/**
-	 * @covers \Fleshgrinder\Core\Comparators\NullableComparator::__invoke
-	 * @dataProvider provide
+	 * @dataProvider provideComparableData
+	 * @uses \Fleshgrinder\Core\Ordering
 	 */
-	public static function testInvoke(int $expected, $lhs, $rhs) {
-		static::assertSame($expected, (new NullableComparator)($lhs, $rhs));
+	public static function testInvoke(Ordering $expected, $lhs, $rhs) {
+		static::assertEquals($expected, NullableComparator::compare($lhs, $rhs));
 	}
 }

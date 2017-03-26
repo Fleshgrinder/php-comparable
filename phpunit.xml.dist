@@ -36,12 +36,13 @@
 	<php>
 		<ini name="assert.active" value="1"/>
 		<ini name="assert.bail" value="0"/>
-		<ini name="assert.callback" value="0"/>
-		<ini name="assert.quiet_eval" value="0"/>
-		<ini name="assert.warning" value="1"/>
 		<ini name="error_reporting" value="32767"/>
 		<ini name="memory_limit" value="-1"/>
 	</php>
+
+	<logging>
+		<log target="build/logs/clover.xml" type="coverage-clover"/>
+	</logging>
 
 	<testsuites>
 		<testsuite name="unit_tests">

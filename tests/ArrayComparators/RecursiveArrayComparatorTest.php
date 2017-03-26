@@ -9,33 +9,29 @@ declare(strict_types = 1);
 
 namespace Fleshgrinder\Core\ArrayComparators;
 
-use Fleshgrinder\Core\{
-	Ordering, Value
-};
+use Fleshgrinder\Core\{DataTypeProviderTrait, Ordering};
 use PHPUnit\Framework\TestCase;
 
 final class RecursiveArrayComparatorTest extends TestCase {
+	use DataTypeProviderTrait;
+
 	public static function provideComparableData() {
+		$data = [];
+
+		foreach (static::provideDataTypes() as $type => $value) {
+			$data["[[{$type}, [{$type}]]] <=> [[{$type}, [{$type}]]] === EQ"] = [Ordering::Equal(), [$value, [$value]], [$value, [$value]]];
+		}
+
+		$data['[[Ordering::Less] <=> [Ordering::Greater] === LT'] = [Ordering::Less(), [[Ordering::Less()]], [[Ordering::Greater()]]];
+		$data['[[Ordering::Greater] <=> [Ordering::Less] === GT'] = [Ordering::Greater(), [[Ordering::Greater()]], [[Ordering::Less()]]];
+
 		$r1 = \fopen('php://memory', 'rb');
 		$r2 = \fopen('php://memory', 'rb');
 
-		return [
-			'[[[]] <=> [[[]] === Ordering::EQ'               => [Ordering::Equal(), [[[]]], [[[]]]],
-			'[[true]] <=> [[true]] === Ordering::EQ'         => [Ordering::Equal(), [[\true]], [[\true]]],
-			'[[false]] <=> [[false]] === Ordering::EQ'       => [Ordering::Equal(), [[\false]], [[\false]]],
-			'[[1.1]] <=> [[1.1]] === Ordering::EQ'           => [Ordering::Equal(), [[1.1]], [[1.1]]],
-			'[[1]] <=> [[1]] === Ordering::EQ'               => [Ordering::Equal(), [[1]], [[1]]],
-			'[[null]] <=> [[null]] === Ordering::EQ'         => [Ordering::Equal(), [[\null]], [[\null]]],
-			'[[object]] <=> [[object]] === Ordering::EQ'     => [Ordering::Equal(), [[(object) []]], [[(object) []]]],
-			'[[resource]] <=> [[resource]] === Ordering::EQ' => [Ordering::Equal(), [[$r1]], [[$r1]]],
-			'[["foo"]] <=> [["foo"]] === Ordering::EQ'       => [Ordering::Equal(), [['foo']], [['foo']]],
+		$data['[r1, [r2, [r1]]] <=> [r1, [r2, [r2]]] === LT'] = [Ordering::Less(), [$r1, [$r2, [$r1]]], [$r1, [$r2, [$r2]]]];
+		$data['[r1, [r2, [r2]]] <=> [r1, [r2, [r1]]] === GT'] = [Ordering::Greater(), [$r1, [$r2, [$r2]]], [$r1, [$r2, [$r1]]]];
 
-			'[[Ordering::Less]] <=> [[Ordering::Greater]] === Ordering::LT' => [Ordering::Less(), [[Ordering::Less()]], [[Ordering::Greater()]]],
-			'[[Ordering::Greater]] <=> [[Ordering::Less]] === Ordering::GT' => [Ordering::Greater(), [[Ordering::Greater()]], [[Ordering::Less()]]],
-
-			'[[r1, r2, r1]] <=> [[r1, r2, r2]] === Ordering::LT' => [Ordering::Less(), [[$r1, $r2, $r1]], [[$r1, $r2, $r2]]],
-			'[[r1, r2, r2]] <=> [[r1, r2, r1]] === Ordering::GT' => [Ordering::Greater(), [[$r1, $r2, $r2]], [[$r1, $r2, $r1]]],
-		];
+		return $data;
 	}
 
 	/**
@@ -47,7 +43,8 @@ final class RecursiveArrayComparatorTest extends TestCase {
 	 * @covers \Fleshgrinder\Core\Comparators\DefaultComparator::__invoke
 	 * @covers \Fleshgrinder\Core\Ordering::__construct
 	 * @covers \Fleshgrinder\Core\Ordering::compareTo
-	 * @covers \Fleshgrinder\Core\Ordering::doCompareTo
+	 * @covers \Fleshgrinder\Core\Ordering::compareTypeSafeTo
+	 * @covers \Fleshgrinder\Core\Ordering::new
 	 * @covers \Fleshgrinder\Core\Ordering::toInt
 	 * @dataProvider provideComparableData
 	 */
@@ -56,24 +53,10 @@ final class RecursiveArrayComparatorTest extends TestCase {
 	}
 
 	public static function provideUncomparableData() {
-		$types = [
-			Value::TYPE_ARRAY    => [],
-			Value::TYPE_BOOL     => \true,
-			Value::TYPE_FLOAT    => 1.1,
-			Value::TYPE_INT      => 1,
-			Value::TYPE_NULL     => \null,
-			Value::TYPE_OBJECT   => (object) [],
-			Value::TYPE_RESOURCE => \fopen('php://memory', 'rb'),
-			Value::TYPE_STRING   => 'string',
-		];
+		$data = static::provideMismatchingTypes();
 
-		$data = [];
-		foreach ($types as $l_name => $l_type) {
-			foreach ($types as $r_name => $r_type) {
-				if ($l_name !== $r_name) {
-					$data["[[{$l_name}]] <=> [[{$r_name}]]"] = [[[$l_type]], [[$r_type]]];
-				}
-			}
+		foreach ($data as &$value) {
+			$value = [[[$value[0], [[$value[0]]]]], [[$value[0], [[$value[1]]]]]];
 		}
 
 		return $data;
@@ -86,6 +69,7 @@ final class RecursiveArrayComparatorTest extends TestCase {
 	 * @covers \Fleshgrinder\Core\ArrayComparators\RecursiveArrayComparator::compare
 	 * @covers \Fleshgrinder\Core\ArrayComparators\RecursiveArrayComparator::doCompare
 	 * @covers \Fleshgrinder\Core\Comparators\DefaultComparator::__invoke
+	 * @covers \Fleshgrinder\Core\Comparators\DefaultComparator::new
 	 * @dataProvider provideUncomparableData
 	 * @expectedException \Fleshgrinder\Core\UncomparableException
 	 * @uses \Fleshgrinder\Core\Ordering

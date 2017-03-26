@@ -9,7 +9,9 @@ declare(strict_types = 1);
 
 namespace Fleshgrinder\Core\Comparators;
 
-use Fleshgrinder\Core\{Ordering, Uncloneable};
+use Fleshgrinder\Core\{
+	Immutable, Ordering
+};
 
 /**
  * The **nullable comparator** uses the {@see DefaultComparator} to compare
@@ -19,7 +21,7 @@ use Fleshgrinder\Core\{Ordering, Uncloneable};
  * null.
  */
 class NullableComparator implements Comparator {
-	use ComparatorTrait, Uncloneable;
+	use ComparatorTrait, Immutable;
 
 	/** @inheritDoc */
 	public function __invoke($lhs, $rhs): int {
@@ -35,6 +37,6 @@ class NullableComparator implements Comparator {
 			return Ordering::GT;
 		}
 
-		return (new DefaultComparator)($lhs, $rhs);
+		return DefaultComparator::new()($lhs, $rhs);
 	}
 }

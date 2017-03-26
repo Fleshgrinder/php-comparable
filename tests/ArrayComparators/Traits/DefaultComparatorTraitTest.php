@@ -28,8 +28,9 @@ final class DefaultComparatorTraitTest extends TestCase {
 	/**
 	 * @testdox instantiates and exports a \Fleshgrinder\Core\Comparators\DefaultComparator instance
 	 * @covers \Fleshgrinder\Core\ArrayComparators\Traits\DefaultComparatorTrait::__construct
+	 * @covers \Fleshgrinder\Core\Comparators\DefaultComparator::new
 	 */
 	public static function testConstruct() {
-		static::assertAttributeInstanceOf(DefaultComparator::CLASS, 'comparator', new DefaultComparatorFake);
+		static::assertAttributeInstanceOf(DefaultComparator::CLASS, 'comparator', DefaultComparatorFake::new());
 	}
 }

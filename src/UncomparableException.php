@@ -23,37 +23,28 @@ namespace Fleshgrinder\Core;
  * > --- [Grammarist](http://grammarist.com/usage/incomparable-uncomparable/)
  */
 class UncomparableException extends \InvalidArgumentException {
-	/* @noinspection PhpDocMissingThrowsInspection */
 	/**
-	 * Construct new uncomparable exception where a comparison of two values
-	 * cannot be compared because they are of incompatible types.
+	 * Construct new uncomparable exception instance.
 	 *
-	 * This is very similar to {@see fromUnexpectedType} and
-	 * {@see fromUnexpectedTypes}, the difference is that the expected type is
-	 * defined by a reference value, and not by a fixed specific type.
-	 *
-	 * @param $expected
-	 *     type that the actual value did not have.
-	 * @param $actual
-	 *     value that was of a different type.
+	 * @param $message
+	 *     pattern to forward to the formatter.
+	 * @param $arguments
+	 *     arguments to pass to the formatter.
+	 * @throws \Exception
+	 * @throws \Fleshgrinder\Core\Formatter\InvalidArgumentException
+	 * @throws \Fleshgrinder\Core\Formatter\MissingPlaceholderException
 	 */
-	public static function fromIncompatibleTypes($expected, $actual): self {
-		/* @noinspection ExceptionsAnnotatingAndHandlingInspection */
-		return new self(Formatter::format('Cannot compare {:?} with {:?}', [$expected, $actual]));
+	public static function new(string $message, array $arguments = [], \Throwable $cause = \null): self {
+		return new static(Formatter::format($message, $arguments), 0, $cause);
 	}
 
 	/* @noinspection PhpDocMissingThrowsInspection */
 	/**
-	 * Construct new uncomparable exception where a comparison can be performed
-	 * only if the actual value is of a fixed type.
-	 *
-	 * @param $expected
-	 *     type that the value did not have.
-	 * @param $actual
-	 *     value that was of a different type.
+	 * Construct new uncomparable exception where a comparison of two values
+	 * cannot be compared because they are of incompatible types.
 	 */
-	public static function fromUnexpectedType(string $expected, $actual): self {
+	public static function fromIncompatibleTypes($expected, $actual, \Throwable $cause = \null): self {
 		/* @noinspection ExceptionsAnnotatingAndHandlingInspection */
-		return new static(Formatter::format('Cannot compare {} with {:?}', [$expected, $actual]));
+		return static::new('Cannot compare {:?} with {:?}', [$expected, $actual], $cause);
 	}
 }

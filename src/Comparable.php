@@ -10,69 +10,72 @@ namespace Fleshgrinder\Core;
 use Fleshgrinder\Core\Comparators\Comparator;
 
 /**
- * The **comparable** interface defines the contract for all classes that
- * provide custom ordering and consequently sorting. Implementers are
- * encouraged to make use of the {@see ComparableTrait}, which comes along with
- * this interface to simplify the implementation.
+ * The **comparable** interface provides the functionality for ordering and
+ * comparison of values whose magnitude can be compared. It imposes an order
+ * on the objects of each class that implement it, however, the concrete
+ * implementation decides whether it is a
+ * [total](https://en.wikipedia.org/wiki/Toset) or
+ * [partial](https://en.wikipedia.org/wiki/Poset) order they provide. This
+ * interface does not provide any guarantees in this regard.
+ *
+ * Implementers are encouraged to make use of the {@see ComparableTrait}, which
+ * provides defaults for all methods required by this interface.
+ *
+ * @see \Fleshgrinder\Core\ComparableTrait
  */
 interface Comparable extends Equalable {
 	/**
-	 * Get the default comparator of this comparable instance for functions that
-	 * require a callback, e.g. {@see \usort}.
+	 * Get a {@see Comparator} for this concrete comparable instance.
 	 *
 	 * @return callable|\Fleshgrinder\Core\Comparators\Comparator
 	 */
 	static function getComparator(): Comparator;
 
 	/**
-	 * Get the reversed default comparator of this comparable instance for
-	 * functions that require a callback, e.g. {@see \usort}.
+	 * Get a reversed {@see Comparator} for this concrete comparable instance.
 	 *
 	 * @return callable|\Fleshgrinder\Core\Comparators\Comparator
 	 */
 	static function getReverseComparator(): Comparator;
 
 	/**
-	 * Compare this object with the specified value for order.
+	 * Compare this object with the given other value for order.
 	 *
-	 * The implementor must ensure
-	 * `gmp_sign($x->compareTo($y)) === -gmp_sign($y->compareTo($x))` for all
-	 * `$x` and `$y`. (This implies that `$x->compareTo($y)` must throw an
-	 * exception if `$y->compareTo($x)` throws an exception.)
+	 * Implementers **must** ensure that this method adheres to the axioms of a
+	 * [poset](https://en.wikipedia.org/wiki/Poset). That is, for all 𝑎, 𝑏, and
+	 * 𝑐 that are instances of this object, the following **must** be satisfied:
 	 *
-	 * The implementor must also ensure that the relation is transitive:
-	 * `$x->compareTo($y) > 0 && $y->compareTo($z) > 0` implies
-	 * `$x->compareTo($z) > 0`.
+	 * 1. 𝑎 ≼ 𝑎
+	 *    ([reflexivity](https://en.wikipedia.org/wiki/Reflexive_relation):
+	 *    every element is related to itself),
+	 * 2. if 𝑎 ≼ 𝑏 and 𝑏 ≼ 𝑎, then 𝑎 = 𝑏
+	 *    ([antisymmetry](https://en.wikipedia.org/wiki/Antisymmetric_relation):
+	 *    two distinct elements cannot be related in both directions),
+	 * 3. if 𝑎 ≼ 𝑏 and 𝑏 ≼ 𝑐, then 𝑎 ≼ 𝑐
+	 *    ([transitivity](https://en.wikipedia.org/wiki/Transitive_relation):
+	 *    if a first element is related to a second element, and, in turn, that
+	 *    element is related to a third element, then the first element is
+	 *    related to the third element).
 	 *
-	 * Finally, the implementor must ensure that `$x->compareTo($y) === 0`,
-	 * which implies that
-	 * `gmp_sign($x->compareTo($z)) === gmp_sign($y->compareTo($z))`, for all
-	 * `$z`.
-	 *
-	 * It is strongly recommended, but not strictly required that
-	 * `($x->compareTo($y) === 0) === $x->equals($y)`. Generally speaking,
-	 * any class that implements the {@see Comparable} interface and violates
-	 * this condition should clearly indicate this fact. The recommended
-	 * language is "Note: this class has a natural ordering that is
-	 * inconsistent with equals."
-	 *
-	 * Implementers must further ensure that this method does not throw any
-	 * other exceptions than the annotated ones.
+	 * Implementers **should** ensure that this method adheres to the axioms
+	 * of a [toset](https://en.wikipedia.org/wiki/Toset). That is, only one of
+	 * 𝑎 ≺ 𝑏, 𝑎 = 𝑏, or 𝑎 ≻ 𝑏 is true, as well as all of the axioms of a poset
+	 * explained above.
 	 *
 	 * @throws \Fleshgrinder\Core\UncomparableException
-	 *     if `$other` is not comparable with this object.
+	 *     if the given other value is not comparable with this object.
 	 */
 	function compareTo($other): Ordering;
 
-	/** Whether this object is less than the other value. */
+	/** Determine if this object is less than the other value. */
 	function isLessThan($other): bool;
 
-	/** Whether this object is less than or equals the other value. */
+	/** Determine if this object is less than or equals the other value. */
 	function isLessThanOrEquals($other): bool;
 
-	/** Whether this object is greater than or equals the other value. */
+	/** Determine if this object is greater than or equals the other value. */
 	function isGreaterThanOrEquals($other): bool;
 
-	/** Whether this object is greater than the other value. */
+	/** Determine if this object is greater than the other value. */
 	function isGreaterThan($other): bool;
 }

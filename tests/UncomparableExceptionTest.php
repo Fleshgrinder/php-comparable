@@ -15,21 +15,11 @@ final class UncomparableExceptionTest extends TestCase {
 	/**
 	 * @testdox ::fromIncompatibleTypes sets format arguments correctly
 	 * @covers \Fleshgrinder\Core\UncomparableException::fromIncompatibleTypes
+	 * @covers \Fleshgrinder\Core\UncomparableException::new
 	 */
 	public static function testFromIncompatibleTypes() {
 		$expected = 'Cannot compare string with integer';
 		$actual   = UncomparableException::fromIncompatibleTypes('str', 123);
-
-		static::assertSame($expected, $actual->getMessage());
-	}
-
-	/**
-	 * @testdox ::fromUnexpectedType sets format arguments correctly
-	 * @covers \Fleshgrinder\Core\UncomparableException::fromUnexpectedType
-	 */
-	public static function testFromUnexpectedType() {
-		$expected = 'Cannot compare foo with array';
-		$actual   = UncomparableException::fromUnexpectedType('foo', []);
 
 		static::assertSame($expected, $actual->getMessage());
 	}

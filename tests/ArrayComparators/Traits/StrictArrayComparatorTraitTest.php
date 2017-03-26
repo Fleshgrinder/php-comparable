@@ -15,7 +15,7 @@ final class StrictArrayComparatorFake {
 	use ArrayComparatorTrait, StrictArrayComparatorTrait;
 
 	public function __construct() {
-		$this->comparator = function () {};
+		$this->comparator = function () { };
 	}
 }
 

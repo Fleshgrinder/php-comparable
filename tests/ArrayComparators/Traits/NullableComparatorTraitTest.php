@@ -28,8 +28,9 @@ final class NullableComparatorTraitTest extends TestCase {
 	/**
 	 * @testdox instantiates and exports a \Fleshgrinder\Core\Comparators\NullableComparator instance
 	 * @covers \Fleshgrinder\Core\ArrayComparators\Traits\NullableComparatorTrait::__construct
+	 * @covers \Fleshgrinder\Core\Comparators\NullableComparator::new
 	 */
 	public static function testConstruct() {
-		static::assertAttributeInstanceOf(NullableComparator::CLASS, 'comparator', new NullableComparatorFake);
+		static::assertAttributeInstanceOf(NullableComparator::CLASS, 'comparator', NullableComparatorFake::new());
 	}
 }

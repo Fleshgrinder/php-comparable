@@ -7,13 +7,17 @@
 
 namespace Fleshgrinder\Core\ArrayComparators;
 
-use Fleshgrinder\Core\ArrayComparators\Traits\{NullableComparatorTrait, RecursiveArrayComparatorTrait, StrictArrayComparatorTrait};
+use Fleshgrinder\Core\ArrayComparators\Traits\{
+	NullableComparatorTrait, RecursiveArrayComparatorTrait, StrictArrayComparatorTrait
+};
 use Fleshgrinder\Core\Comparators\Comparator;
 
 /**
  * The **nullable recursive array comparator** compares multidimensional arrays
- * with an equal amount of items and matching nullable types.
+ * with an equal amount of elements and matching nullable types.
  */
 final class NullableRecursiveArrayComparator implements Comparator {
-	use NullableComparatorTrait, RecursiveArrayComparatorTrait, StrictArrayComparatorTrait;
+	use NullableComparatorTrait,
+		RecursiveArrayComparatorTrait,
+		StrictArrayComparatorTrait;
 }

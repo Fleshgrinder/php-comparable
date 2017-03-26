@@ -14,13 +14,13 @@ use Fleshgrinder\Core\Comparators\DefaultComparator;
 /**
  * The **default comparator trait** can be used together with the
  * {@see ArrayComparatorTrait} to use a {@see DefaultComparator} for the actual
- * comparison of the individual items of the input arrays.
+ * comparison of the input arrays elements.
  *
  * @mixin \Fleshgrinder\Core\ArrayComparators\Traits\ArrayComparatorTrait
  */
 trait DefaultComparatorTrait {
 	/** Construct new array comparator instance. */
-	public function __construct() {
-		$this->comparator = new DefaultComparator;
+	final protected function __construct() {
+		$this->comparator = DefaultComparator::new();
 	}
 }

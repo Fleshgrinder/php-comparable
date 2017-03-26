@@ -7,13 +7,17 @@
 
 namespace Fleshgrinder\Core\ArrayComparators;
 
-use Fleshgrinder\Core\ArrayComparators\Traits\{ArrayComparatorTrait, DefaultComparatorTrait, StrictArrayComparatorTrait};
+use Fleshgrinder\Core\ArrayComparators\Traits\{
+	ArrayComparatorTrait, DefaultComparatorTrait, StrictArrayComparatorTrait
+};
 use Fleshgrinder\Core\Comparators\Comparator;
 
 /**
  * The **array comparator** compares unidimensional arrays with an equal amount
- * of items and matching types.
+ * of elements and matching types.
  */
 final class ArrayComparator implements Comparator {
-	use ArrayComparatorTrait, DefaultComparatorTrait, StrictArrayComparatorTrait;
+	use ArrayComparatorTrait,
+		DefaultComparatorTrait,
+		StrictArrayComparatorTrait;
 }

@@ -14,13 +14,13 @@ use Fleshgrinder\Core\Comparators\NullableComparator;
 /**
  * The **nullable comparator trait** can be used together with the
  * {@see ArrayComparatorTrait} to use a {@see NullableComparator} for the actual
- * comparison of the individual items of the input arrays.
+ * comparison of the input arrays elements.
  *
  * @mixin \Fleshgrinder\Core\ArrayComparators\Traits\ArrayComparatorTrait
  */
 trait NullableComparatorTrait {
 	/** Construct new array comparator instance. */
-	public function __construct() {
-		$this->comparator = new NullableComparator;
+	final protected function __construct() {
+		$this->comparator = NullableComparator::new();
 	}
 }

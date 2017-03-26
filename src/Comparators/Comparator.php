@@ -7,7 +7,11 @@
 
 namespace Fleshgrinder\Core\Comparators;
 
-/** Contract for custom comparators. */
+/**
+ * A comparison function that can be used for ordering or comparison of two
+ * values. Comparators can be passed to sort functions such as {@see uasort},
+ * {@see uksort}, or {@see usort} for comparing values.
+ */
 interface Comparator {
 	/**
 	 * Compare the left- with the right-hand side.

@@ -46,4 +46,4 @@ install:
 
 test_script:
   - CD %APPVEYOR_BUILD_FOLDER%
-  - phpunit --no-coverage
+  - phpunit --coverage-text=build/phpunit.tmp
